@@ -1,5 +1,5 @@
 /* Accrue service worker: lets the installed app open offline and load fast. */
-const CACHE = 'accrue-v7';
+const CACHE = 'accrue-v8';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './icon-maskable-192.png', './icon-maskable-512.png', './apple-touch-icon.png'];
 
 self.addEventListener('install', e => {

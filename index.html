@@ -18,7 +18,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script>if(/^https?:$/.test(location.protocol)){const l=document.createElement('link');l.rel='manifest';l.href='manifest.webmanifest';document.head.appendChild(l)}</script>
+<link rel="manifest" href="manifest.webmanifest">
 <style>
 :root{
   --bg:#09090B;--s1:#111113;--s2:#18181B;--s3:#212125;--s4:#2B2B30;
@@ -1334,8 +1334,15 @@ const Note={q:[],busy:false,t:0,res:null,
  dismiss(){if(this.res){clearTimeout(this.t);this.res()}}
 };
 let forceFs=false;
-function isStandalone(){return navigator.standalone===true||matchMedia('(display-mode: standalone)').matches||(matchMedia('(display-mode: fullscreen)').matches&&!document.fullscreenElement&&!document.webkitFullscreenElement)}
-function fitFs(){const fs=forceFs||(!IOS&&(!!(document.fullscreenElement||document.webkitFullscreenElement)||matchMedia('(display-mode: fullscreen)').matches));APP.classList.toggle('fs',fs)}
+const INSTALLED=navigator.standalone===true||matchMedia('(display-mode: standalone)').matches||matchMedia('(display-mode: fullscreen)').matches;
+function isStandalone(){return INSTALLED}
+function fitFs(){
+ let pr=fitFs.p;if(!pr){pr=fitFs.p=document.createElement('div');pr.style.cssText='position:absolute;top:0;left:0;width:0;height:env(safe-area-inset-top,0px);visibility:hidden;pointer-events:none'}
+ if(!pr.isConnected)APP.appendChild(pr);
+ const inset=pr.getBoundingClientRect().height,full=!!(document.fullscreenElement||document.webkitFullscreenElement)||matchMedia('(display-mode: fullscreen)').matches;
+ const edge=inset>0||Math.abs(innerHeight-screen.height)<4;
+ APP.classList.toggle('fs',forceFs||(!IOS&&full&&edge));
+}
 
 /* ================= Sheets ================= */
 const sheets=[];
@@ -2159,13 +2166,18 @@ function openTypeEditor(id,after){
 let deferredPrompt=null;
 addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;if(S.onboarded){renderInstallBanner();if(cur==='you')renderYou()}});
 addEventListener('appinstalled',()=>{deferredPrompt=null;toast('Accrue installed');renderInstallBanner();if(cur==='you')renderYou()});
+const PWA_FILES=['manifest.webmanifest','sw.js','icon-192.png','icon-512.png','icon-maskable-192.png','icon-maskable-512.png'];
+async function pwaMissing(){const out=[];await Promise.all(PWA_FILES.map(async f=>{try{const r=await fetch(f,{cache:'no-store'});if(!r.ok)out.push(f)}catch(e){out.push(f)}}));return PWA_FILES.filter(f=>out.includes(f))}
 function installApp(){
  if(deferredPrompt){const p=deferredPrompt;p.prompt();(p.userChoice||Promise.resolve()).finally(()=>{deferredPrompt=null;renderInstallBanner();if(cur==='you')renderYou()});return}
  const hosted=/^https?:$/.test(location.protocol);
- const sh=openSheet({html:`<div class="sh-head"><h3>Install Accrue</h3>${closeBtn}</div>
- ${isStandalone()?`<div class="sh-sub">Accrue is already running as an installed app.</div>`:hosted?`<div class="sh-sub">Install it from Chrome's menu:</div><ol class="steps"><li><span>Tap <b>⋮</b> at the top right of Chrome.</span></li><li><span>Tap <b>Install app</b> (or <b>Add to Home screen</b>, then <b>Install</b>).</span></li><li><span>Open Accrue from your home screen. It opens fullscreen.</span></li></ol>`
- :`<div class="sh-sub">Chrome can only install apps that come from a web address, not from a file on your phone. Put the app online once (it's free), then install it:</div><ol class="steps"><li><span>On a computer, unzip <b>accrue-app.zip</b>.</span></li><li><span>Go to <b>app.netlify.com/drop</b> and drag the <b>accrue-app</b> folder onto the page.</span></li><li><span>Open the link it gives you in <b>Chrome</b> on your phone.</span></li><li><span>Tap <b>Install</b> when Chrome offers it, or <b>⋮ → Install app</b>.</span></li><li><span>Move your progress over with <b>Backup & restore</b>.</span></li></ol><div class="sg-n">The user manual has the full guide, including a GitHub Pages option.</div>`}`});
+ const menu=`<div class="sh-sub">Install it from Chrome's menu:</div><ol class="steps"><li><span>Tap <b>⋮</b> at the top right of Chrome.</span></li><li><span>Tap <b>Install app</b> (or <b>Add to Home screen</b>, then <b>Install</b>).</span></li><li><span>Open Accrue from your home screen. It opens fullscreen.</span></li></ol>`;
+ const sh=openSheet({html:`<div class="sh-head"><h3>Install Accrue</h3>${closeBtn}</div><div id="instBody">
+ ${isStandalone()?`<div class="sh-sub">Accrue is already running as an installed app.</div>`:hosted?`<div class="sh-sub">Checking your site…</div>`
+ :`<div class="sh-sub">Chrome can only install apps that come from a web address, not from a file on your phone. Put the app online once (it's free), then install it:</div><ol class="steps"><li><span>On a computer, unzip <b>accrue-app.zip</b>.</span></li><li><span>Upload <b>every file</b> inside the <b>accrue-app</b> folder to your site, not just index.html.</span></li><li><span>Open your site's link in <b>Chrome</b> on your phone.</span></li><li><span>Tap <b>Install</b> when Chrome offers it, or <b>⋮ → Install app</b>.</span></li><li><span>Move your progress over with <b>Backup & restore</b>.</span></li></ol>`}</div>`});
  sh.sheet.addEventListener('click',e=>{if(e.target.closest('[data-x="close"]'))sh.close()});
+ if(hosted&&!isStandalone())pwaMissing().then(miss=>{const b=$('#instBody',sh.sheet);if(!b)return;
+  b.innerHTML=miss.length?`<div class="sh-sub">Chrome can't install Accrue yet because ${miss.length===1?'this file is':'these files are'} missing from your site. ${miss.length===1?'It':'They'} must sit in the same folder as index.html:</div><div class="sg-b" style="margin-bottom:14px">${miss.map(f=>`<div class="srow"><span class="si">${ic('x')}</span><div class="sl"><span>${f}</span></div></div>`).join('')}</div><ol class="steps"><li><span>Unzip <b>accrue-app.zip</b>. All of these files are inside it.</span></li><li><span>On GitHub, open your repository and tap <b>Add file → Upload files</b>. Add the files and tap <b>Commit changes</b>.</span></li><li><span>Wait a minute for the site to update, then reload this page in Chrome.</span></li></ol>`:menu});
 }
 
 /* ================= Onboarding ================= */
@@ -2212,7 +2224,7 @@ function showOnboarding(){
 
 /* ================= System ================= */
 function goFull(){
- if(!S.settings.keepFullscreen||IOS||isStandalone())return;const d=document.documentElement;
+ if(!S.settings.keepFullscreen||IOS)return;const d=document.documentElement;
  if(document.fullscreenElement||document.webkitFullscreenElement)return;
  const f=d.requestFullscreen||d.webkitRequestFullscreen;if(!f)return;
  try{const p=f.call(d,{navigationUI:'hide'});if(p&&p.then)p.then(()=>{try{screen.orientation.lock('portrait').catch(()=>{})}catch(e){}}).catch(()=>{})}catch(e){}
