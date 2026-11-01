@@ -1,6 +1,6 @@
 /* Chronos 2 — offline support.
    Serves the app from this device first, then quietly refreshes it from the network. */
-const CACHE = 'chronos2-v2';
+const CACHE = 'chronos2-v3';
 const CORE = [
   './',
   './index.html',
