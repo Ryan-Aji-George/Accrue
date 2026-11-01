@@ -1,16 +1,16 @@
 /* Chronos 2 — offline support.
    The page itself comes from the network when you're online (so updates show up right away)
    and from this device when you're not. Icons and other files are served from this device first. */
-const CACHE = 'chronos2-v5';
+const CACHE = 'chronos2-v6';
 const CORE = [
   './',
   './index.html',
   './manifest.webmanifest',
-  './icons/icon.svg',
-  './icons/icon-192.png',
-  './icons/icon-512.png',
-  './icons/icon-maskable-512.png',
-  './icons/apple-touch-icon.png'
+  './icons/icon-v3.svg',
+  './icons/icon-192-v3.png',
+  './icons/icon-512-v3.png',
+  './icons/icon-maskable-512-v3.png',
+  './icons/apple-touch-icon-v3.png'
 ];
 
 self.addEventListener('install', event => {
