@@ -194,6 +194,23 @@ button.time:not(:disabled):active{transform:scale(.96)}
 .tasks-card{display:flex;flex-direction:column;padding:22px 18px 18px}
 .card-head{display:flex;align-items:center;justify-content:space-between;padding:4px 10px 10px}
 .card-head h2{font:600 21px/1.2 var(--font-display);letter-spacing:-.01em}
+.card-head{padding:2px 10px 12px}
+.panel-tabs{position:relative;display:flex;align-items:center;gap:24px;padding-bottom:9px}
+.panel-tabs button{display:inline-flex;align-items:center;gap:8px;font:600 21px/1.2 var(--font-display);letter-spacing:-.01em;color:var(--text-3);transition:color .3s var(--ease)}
+.panel-tabs button.on{color:var(--text)}
+@media (hover:hover){.panel-tabs button:not(.on):hover{color:var(--text-2)}}
+.panel-tabs .count{font-family:var(--font);letter-spacing:0}
+.panel-tabs .seg-ind{position:absolute;left:0;top:auto;bottom:0;height:2.5px;border-radius:2px;background:var(--accent);box-shadow:none!important;opacity:0;
+  transition:transform .55s var(--spring),width .55s var(--spring),opacity .3s,background-color .4s}
+.panel-tabs.no-anim .seg-ind{transition:none}
+.note-status{font-size:13px;color:var(--text-3);opacity:0;transition:opacity .4s var(--ease)}
+.note-status.show{opacity:1}
+.panel{flex:1;min-height:0;display:flex;flex-direction:column}
+.panel.in{animation:panelIn .45s var(--ease)}
+@keyframes panelIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.notes{flex:1;min-height:0;width:100%;resize:none;border:0;outline:0;background:transparent;color:var(--text);
+  font:400 16px/1.7 var(--font);padding:6px 12px 12px;overflow-y:auto;scrollbar-width:thin;caret-color:var(--accent)}
+.notes::placeholder{color:var(--text-3)}
 .count{min-width:28px;height:26px;padding:0 9px;border-radius:999px;background:var(--surface-2);color:var(--text-2);
   font-size:13px;font-weight:600;display:grid;place-items:center;font-variant-numeric:tabular-nums}
 .count.bump{animation:bump .5s var(--spring)}
@@ -489,6 +506,13 @@ body.mini .screen,body.mini .calendar{display:none}
   .pip .controls{align-self:start}
 }
 
+/* paused-mode dot */
+.seg button.has-progress::after{content:"";position:absolute;top:6px;right:8px;width:6px;height:6px;border-radius:50%;background:var(--dot,var(--accent));
+  box-shadow:0 0 0 2px var(--seg-bg);animation:dotIn .45s var(--spring)}
+.seg button[data-value=break],.seg button[data-mode=break]{--dot:var(--break)}
+.seg button[data-value=custom],.seg button[data-mode=custom]{--dot:var(--custom)}
+@keyframes dotIn{from{transform:scale(0)}to{transform:scale(1)}}
+
 /* ===== solid surfaces ===== */
 .g-base{display:none}
 html[data-theme=light] .ambient{display:none}
@@ -653,11 +677,16 @@ body.ready .reveal{animation:rise .9s var(--ease) both;animation-delay:calc(var(
       <button class="today-pill" id="todayPill" hidden aria-label="Log today's blocks"><span class="dot"></span><span><b id="todayCount">0</b> <span id="todayWord">blocks today</span></span></button>
     </section>
 
-    <section class="card tasks-card reveal" style="--d:2" aria-label="Plan">
+    <section class="card tasks-card reveal" style="--d:2" aria-label="Plan and notes">
       <div class="card-head">
-        <h2>Plan</h2>
-        <span class="count" id="taskCount">0</span>
+        <div class="panel-tabs" id="panelTabs" role="tablist">
+          <span class="seg-ind"></span>
+          <button role="tab" data-value="plan" aria-controls="panelPlan">Plan<span class="count" id="taskCount">0</span></button>
+          <button role="tab" data-value="notes" aria-controls="panelNotes">Notes</button>
+        </div>
+        <span class="note-status" id="noteStatus" aria-live="polite"></span>
       </div>
+      <div class="panel" id="panelPlan" role="tabpanel">
       <ul class="task-list" id="taskList"></ul>
       <div class="empty" id="taskEmpty">
         <div class="empty-art"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M8.5 12.3l2.4 2.4 4.6-5.2"/></svg></div>
@@ -669,6 +698,10 @@ body.ready .reveal{animation:rise .9s var(--ease) both;animation-delay:calc(var(
         <input id="addInput" type="text" placeholder="Add a task" maxlength="240" enterkeyhint="done" aria-label="New task">
         <button type="submit" class="add-btn" aria-label="Add task"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5.5 11.5L12 5l6.5 6.5"/></svg></button>
       </form>
+      </div>
+      <div class="panel" id="panelNotes" role="tabpanel" hidden>
+        <textarea class="notes" id="notes" placeholder="Write notes here" spellcheck="true" aria-label="Notes"></textarea>
+      </div>
     </section>
   </main>
 
@@ -775,7 +808,7 @@ body.ready .reveal{animation:rise .9s var(--ease) both;animation-delay:calc(var(
         <div class="row"><div class="row-text"><div class="row-label">Storage</div><div class="row-hint" id="storageInfo">IndexedDB on this device</div></div></div>
         <div class="row"><div class="row-text"><div class="row-label">Export backup</div><div class="row-hint">Download everything as a file</div></div><button class="btn sm" id="exportBtn">Export</button></div>
         <div class="row"><div class="row-text"><div class="row-label">Import backup</div><div class="row-hint">Restore from a Chronos 2 file</div></div><button class="btn sm" id="importBtn">Import</button></div>
-        <div class="row"><div class="row-text"><div class="row-label">Reset everything</div><div class="row-hint">Tasks, calendar and settings</div></div><button class="btn sm warn" id="resetAllBtn">Reset</button></div>
+        <div class="row"><div class="row-text"><div class="row-label">Reset everything</div><div class="row-hint">Tasks, notes, calendar and settings</div></div><button class="btn sm warn" id="resetAllBtn">Reset</button></div>
       </div>
     </section>
 
@@ -899,7 +932,7 @@ const DEFAULTS = {
   autoBreak: true, autoFocus: false, autoLog: true,
   sound: true, soundType: 'chime', volume: 0.6, uiSounds: true, vibrate: true, notify: false,
   look: 'noon', autoDark: false, wakeLock: true, titleTimer: true,
-  weekStart: 1, scale: 'auto', goal: 8
+  weekStart: 1, scale: 'auto', goal: 8, panel: 'plan'
 };
 const THEMES = {
   noon:     { name: 'Noon',     scheme: 'light', bg: '#F6F7F9', surface: '#FFFFFF', s2: '#F1F3F6', s3: '#E3E7ED', text: '#0F1626', t2: '#556074', t3: '#9AA2B1', ink: '15,22,38',    accent: '#2E5BEA', brk: '#0E9384', custom: '#7A5AF8' },
@@ -1059,7 +1092,7 @@ function positionInd(seg) {
   ind.style.transform = `translateX(${on.offsetLeft}px)`;
   ind.style.opacity = 1;
 }
-const positionAllInds = () => $$('.seg').forEach(positionInd);
+const positionAllInds = () => $$('.seg, .panel-tabs').forEach(positionInd);
 
 /* ---------- Dialog ---------- */
 const dlg = $('#dialog'), dlgBackdrop = $('#dlgBackdrop');
@@ -1142,6 +1175,16 @@ const TICKS_HTML = (() => {
 $('.ticks', ringWrap).innerHTML = TICKS_HTML;
 
 const durationFor = m => Math.round(settings[KEYMAP[m]] * 60);
+/* Each mode keeps its own clock. The mode on screen lives in T; the others wait here with their progress. */
+const stash = {};
+const hasProgress = st => st && st.remaining > 0.05 && st.remaining < st.duration - 0.5;
+const pausedModes = () => Object.keys(stash).filter(m => m !== T.mode && hasProgress(stash[m]));
+function stashCurrent() { stash[T.mode] = { duration: T.duration, remaining: T.running ? remainingNow() : T.remaining }; }
+function loadMode(m) {
+  const st = stash[m]; delete stash[m];
+  if (hasProgress(st)) { T.duration = st.duration; T.remaining = Math.min(st.remaining, st.duration); }
+  else { T.duration = durationFor(m); T.remaining = T.duration; }
+}
 const remainingNow = () => T.running ? Math.max(0, (T.endAt - Date.now()) / 1000) : T.remaining;
 const inProgress = () => T.running || T.remaining < T.duration - 0.5;
 const targetProgress = () => T.duration ? clamp(remainingNow() / T.duration, 0, 1) : 0;
@@ -1199,7 +1242,12 @@ function updateUI() {
   document.body.dataset.mode = T.mode;
   document.body.classList.toggle('is-running', T.running);
   document.body.classList.toggle('is-paused', !T.running && inProgress() && !transitioning);
-  $$('button', modesEl).forEach(b => { const on = b.dataset.value === T.mode; b.classList.toggle('on', on); b.setAttribute('aria-selected', on); });
+  const waiting = pausedModes();
+  $$('button', modesEl).forEach(b => {
+    const on = b.dataset.value === T.mode; b.classList.toggle('on', on); b.setAttribute('aria-selected', on);
+    const w = waiting.includes(b.dataset.value); b.classList.toggle('has-progress', w);
+    b.title = w ? `${LABELS[b.dataset.value]} paused, ${fmt(stash[b.dataset.value].remaining)} left` : '';
+  });
   positionInd(modesEl);
   modeLabel.textContent = LABELS[T.mode];
   playBtn.setAttribute('aria-label', T.running ? 'Pause' : 'Start');
@@ -1208,6 +1256,7 @@ function updateUI() {
   if (T.running) setStatus('Ends at ' + new Date(T.endAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }));
   else if (transitioning) setStatus('Complete');
   else if (inProgress()) setStatus('Paused');
+  else if (waiting.length) setStatus(`${LABELS[waiting[0]]} has ${fmt(stash[waiting[0]].remaining)} left`);
   else setStatus(T.mode === 'custom' ? 'Tap the time to set it' : 'Ready');
   updateTitle();
   pipSync();
@@ -1219,7 +1268,8 @@ function swapIn(els) {
     { duration: 480, easing: EASE }));
 }
 let saveTimerT = 0;
-const timerSnapshot = () => ({ mode: T.mode, duration: T.duration, remaining: T.running ? remainingNow() : T.remaining, running: T.running, endAt: T.endAt });
+const timerSnapshot = () => ({ mode: T.mode, duration: T.duration, remaining: T.running ? remainingNow() : T.remaining, running: T.running, endAt: T.endAt,
+  stash: Object.fromEntries(Object.entries(stash).filter(([m, st]) => m !== T.mode && hasProgress(st))) });
 function saveTimer() { clearTimeout(saveTimerT); saveTimerT = setTimeout(() => safe(db.put('kv', timerSnapshot(), 'timer')), 60); }
 function scheduleCompletion() {
   clearTimeout(completionTimer);
@@ -1250,28 +1300,26 @@ function reset() {
   animateTo(1); saveTimer(); updateUI(); haptic(10);
   spin(resetBtn); eachView(v => spin(v.els.reset));
 }
-async function setMode(m, { force = false, autoStart = false, quiet = false } = {}) {
-  if (!force) {
-    if (transitioning || m === T.mode) return;
-    if (inProgress()) {
-      const ok = await confirmDialog({ title: 'End this session?', text: `Switching to ${LABELS[m]} resets the current timer.`, confirm: 'Switch' });
-      if (!ok) return;
-    }
-  }
-  const changed = m !== T.mode;
-  T.mode = m; T.duration = durationFor(m); T.remaining = T.duration; T.running = false;
+function setMode(m, { force = false, autoStart = false, quiet = false } = {}) {
+  if (!force && (transitioning || m === T.mode)) return;
+  const changed = m !== T.mode, prev = T.mode, wasRunning = T.running;
+  if (T.running) { T.remaining = remainingNow(); T.running = false; }
   clearTimeout(completionTimer);
+  if (changed) { stashCurrent(); T.mode = m; loadMode(m); }
+  else { T.duration = durationFor(m); T.remaining = T.duration; }
   if (!autoStart) unlockScreen();
   lastSec = -1; updateTime(T.remaining);
-  animateTo(1); updateUI(); saveTimer();
+  animateTo(targetProgress()); updateUI(); saveTimer();
+  if (changed && wasRunning && !autoStart && hasProgress(stash[prev])) toast(`${LABELS[prev]} paused with ${fmt(stash[prev].remaining)} left`);
   if (changed && !quiet) { swapIn([timeText, modeLabel]); eachView(v => swapIn([v.els.time, v.els.label])); }
   if (autoStart) start();
 }
 function skip() {
   if (transitioning) return;
   haptic(10); uiSound('tap');
-  if (T.mode === 'custom') { if (inProgress()) reset(); else setMode('focus', { force: true }); return; }
-  setMode(T.mode === 'focus' ? 'break' : 'focus', { force: true });
+  const next = T.mode === 'focus' ? 'break' : 'focus';
+  T.running = false; T.remaining = T.duration;
+  setMode(next, { force: true, quiet: false });
 }
 function complete({ away = false } = {}) {
   if (!T.running && !away) return;
@@ -1382,6 +1430,41 @@ function taskEl(t) {
   return li;
 }
 let lastCount = -1;
+/* Plan / Notes tabs */
+const panelTabs = $('#panelTabs'), panelPlan = $('#panelPlan'), panelNotes = $('#panelNotes'), notesEl = $('#notes'), noteStatus = $('#noteStatus');
+panelTabs.classList.add('no-anim');
+function showPanel(which, { animate = true, save = true } = {}) {
+  which = which === 'notes' ? 'notes' : 'plan';
+  $$('button[data-value]', panelTabs).forEach(b => { const on = b.dataset.value === which; b.classList.toggle('on', on); b.setAttribute('aria-selected', on); });
+  const showEl = which === 'notes' ? panelNotes : panelPlan, hideEl = which === 'notes' ? panelPlan : panelNotes;
+  const changed = showEl.hidden;
+  hideEl.hidden = true; showEl.hidden = false;
+  if (changed && animate) restartClass(showEl, 'in');
+  if (which !== 'notes') noteStatus.classList.remove('show');
+  positionInd(panelTabs);
+  if (save && settings.panel !== which) { settings.panel = which; saveSettings(); }
+}
+panelTabs.addEventListener('click', e => {
+  const b = e.target.closest('button[data-value]'); if (!b || b.classList.contains('on')) return;
+  haptic(6); uiSound('tap'); showPanel(b.dataset.value);
+});
+let notesT = 0, notesSaved = '', noteHideT = 0;
+function saveNotes(now) {
+  clearTimeout(notesT);
+  const run = () => {
+    const text = notesEl.value;
+    if (text === notesSaved) return;
+    notesSaved = text;
+    safe(db.put('kv', { text, updated: Date.now() }, 'notes'));
+    noteStatus.textContent = 'Saved'; noteStatus.classList.add('show');
+    clearTimeout(noteHideT); noteHideT = setTimeout(() => noteStatus.classList.remove('show'), 1600);
+  };
+  now ? run() : (notesT = setTimeout(run, 450));
+}
+notesEl.addEventListener('input', () => saveNotes(false));
+notesEl.addEventListener('blur', () => saveNotes(true));
+function setNotes(text) { notesEl.value = text || ''; notesSaved = notesEl.value; }
+
 function updateTaskCount(anim = true) {
   const n = tasks.length;
   taskCount.textContent = n;
@@ -1797,15 +1880,9 @@ class MiniView {
     this.root.remove();
   }
   setMode(m) {
-    if (transitioning) return;
-    if (m === T.mode) { this.clearPending(); this.sync(); return; }
-    if (inProgress() && this.pendingMode !== m) {
-      this.pendingMode = m; haptic(6); uiSound('tap');
-      clearTimeout(this.pendingT); this.pendingT = setTimeout(() => { this.clearPending(); this.sync(); }, 2600);
-      this.sync(); return;
-    }
-    this.clearPending(); haptic(6); uiSound('tap');
-    setMode(m, { force: true });
+    if (transitioning || m === T.mode) return;
+    haptic(6); uiSound('tap');
+    setMode(m);
   }
   clearPending() { this.pendingMode = null; clearTimeout(this.pendingT); }
   check(li) {
@@ -1851,7 +1928,7 @@ class MiniView {
     if (e.time.tagName === 'BUTTON') e.time.disabled = T.running;
     e.play.setAttribute('aria-label', T.running ? 'Pause' : 'Start');
     e.reset.disabled = !inProgress() || transitioning;
-    $$('button[data-mode]', e.seg).forEach(b => { b.classList.toggle('on', b.dataset.mode === T.mode); b.classList.toggle('pending', b.dataset.mode === this.pendingMode); });
+    $$('button[data-mode]', e.seg).forEach(b => { b.classList.toggle('on', b.dataset.mode === T.mode); b.classList.toggle('pending', b.dataset.mode === this.pendingMode); b.classList.toggle('has-progress', pausedModes().includes(b.dataset.mode)); });
     positionInd(e.seg);
     this.renderTasks();
   }
@@ -2263,7 +2340,7 @@ volumeEl.addEventListener('change', () => { saveSettings(); playSound(settings.s
 /* data */
 $('#exportBtn').addEventListener('click', async () => {
   try {
-    const data = { app: 'chronos2', version: 1, exportedAt: new Date().toISOString(), startDate, settings, tasks: await db.all('tasks'), days: await db.all('days') };
+    const data = { app: 'chronos2', version: 1, exportedAt: new Date().toISOString(), startDate, settings, tasks: await db.all('tasks'), days: await db.all('days'), notes: notesEl.value };
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob); a.download = `chronos2-backup-${todayKey()}.json`;
@@ -2288,6 +2365,7 @@ importFile.addEventListener('change', async () => {
       .map(d => ({ date: d.date, count: clamp(Math.round(d.count), 0, 999), updated: d.updated || Date.now() }));
     await db.clear('tasks'); await db.clear('days');
     await db.putMany('tasks', tks); await db.putMany('days', dys);
+    if (typeof data.notes === 'string') await db.put('kv', { text: data.notes, updated: Date.now() }, 'notes');
     settings = { ...DEFAULTS, ...(data.settings || {}) };
     await db.put('kv', settings, 'settings');
     let sd = /^\d{4}-\d{2}-\d{2}$/.test(data.startDate) ? data.startDate : todayKey();
@@ -2299,12 +2377,13 @@ importFile.addEventListener('change', async () => {
   } catch (e) { console.error(e); toast('Import failed'); }
 });
 $('#resetAllBtn').addEventListener('click', async () => {
-  const ok = await confirmDialog({ title: 'Reset everything?', text: 'All tasks, calendar entries and settings will be permanently erased.', confirm: 'Erase all', danger: true });
+  const ok = await confirmDialog({ title: 'Reset everything?', text: 'All tasks, notes, calendar entries and settings will be permanently erased.', confirm: 'Erase all', danger: true });
   if (!ok) return;
   await Promise.all([db.clear('tasks'), db.clear('days'), db.clear('kv')]).catch(() => {});
   settings = { ...DEFAULTS }; startDate = todayKey();
   await db.put('kv', startDate, 'startDate').catch(() => {});
   T = { mode: 'focus', duration: durationFor('focus'), remaining: durationFor('focus'), running: false, endAt: 0 };
+  Object.keys(stash).forEach(k => delete stash[k]);
   await loadAll();
   closeSettings();
   toast('Fresh start');
@@ -2321,7 +2400,7 @@ document.addEventListener('keydown', e => {
   else if (k === 'r') reset();
   else if (k === 's') skip();
   else if (k === 'p') togglePip();
-  else if (k === 'n') { e.preventDefault(); (mainMini ? mainMini.els.input : addInput).focus(); }
+  else if (k === 'n') { e.preventDefault(); if (!mainMini) showPanel('plan'); (mainMini ? mainMini.els.input : addInput).focus(); }
   else if (k === ',') openSettings();
   else if (k === '1') setMode('focus');
   else if (k === '2') setMode('break');
@@ -2337,11 +2416,14 @@ let resizeRaf = 0;
 window.addEventListener('resize', () => { if (resizeRaf) return; resizeRaf = requestAnimationFrame(() => { resizeRaf = 0; positionAllInds(); }); });
 window.addEventListener('pagehide', () => {
   if (T.running || inProgress()) db.put('kv', timerSnapshot(), 'timer').catch(() => {});
+  if (notesEl.value !== notesSaved) { notesSaved = notesEl.value; db.put('kv', { text: notesSaved, updated: Date.now() }, 'notes').catch(() => {}); }
   if (pip.mode === 'doc' && pip.win) { try { pip.win.close(); } catch (e) {} }
 });
 
 async function loadAll() {
-  const [tks, dys] = await Promise.all([db.all('tasks'), db.all('days')]);
+  const [tks, dys, nt] = await Promise.all([db.all('tasks'), db.all('days'), db.get('kv', 'notes').catch(() => null)]);
+  setNotes(nt && nt.text);
+  showPanel(settings.panel, { animate: false, save: false });
   tasks = (tks || []).sort((a, b) => a.order - b.order);
   days = new Map((dys || []).filter(d => d.count > 0).map(d => [d.date, d.count]));
   applyTheme(); syncSettingsUI(); renderTasks(); renderCalendar(); renderLegend(); updateTodayPill();
@@ -2358,6 +2440,9 @@ async function init() {
     if (tm && LABELS[tm.mode]) {
       T = { mode: tm.mode, duration: tm.duration || durationFor(tm.mode), remaining: tm.remaining, running: !!tm.running, endAt: tm.endAt || 0 };
       if (!Number.isFinite(T.remaining)) T.remaining = T.duration;
+      if (tm.stash) Object.entries(tm.stash).forEach(([m, st]) => {
+        if (LABELS[m] && m !== T.mode && st && Number.isFinite(st.remaining) && Number.isFinite(st.duration)) stash[m] = { duration: st.duration, remaining: st.remaining };
+      });
     } else {
       T.duration = T.remaining = durationFor('focus');
     }
@@ -2395,7 +2480,7 @@ function reveal() {
   positionAllInds();
   document.body.classList.add('ready');
   if (sp) { sp.classList.add('out'); setTimeout(() => sp.remove(), 800); }
-  requestAnimationFrame(() => { positionAllInds(); requestAnimationFrame(() => $$('.seg.no-anim').forEach(s => s.classList.remove('no-anim'))); });
+  requestAnimationFrame(() => { positionAllInds(); requestAnimationFrame(() => $$('.seg.no-anim, .panel-tabs.no-anim').forEach(s => s.classList.remove('no-anim'))); });
 }
 setTimeout(() => { revealed || (LAUNCH_MS > 0 && reveal()); }, 5000);
 init().catch(e => { console.error(e); reveal(); });
