@@ -169,7 +169,6 @@ button.time:not(:disabled):active{transform:scale(.96)}
 .today-pill{display:inline-flex;align-items:center;gap:8px;height:34px;padding:0 14px 0 12px;border-radius:999px;font-size:13px;
   color:var(--text-2);background:var(--surface-2);border:1px solid var(--line);transition:transform .45s var(--spring),color .2s}
 .today-pill:active{transform:scale(.94)}
-.today-pill .dot{width:8px;height:8px;border-radius:50%;background:#22C55E;box-shadow:0 0 0 3px rgba(34,197,94,.18)}
 .today-pill b{display:inline-block;color:var(--text);font-weight:600;font-variant-numeric:tabular-nums}
 .today-pill b.bump{animation:bump .5s var(--spring)}
 
@@ -396,32 +395,99 @@ kbd{font:600 11px var(--font);padding:2px 6px;border-radius:6px;background:var(-
 .toast button{height:36px;padding:0 15px;border-radius:999px;font-weight:600;background:rgba(127,127,127,.18)}
 .toast button:active{transform:scale(.94)}
 .spark{position:fixed;width:6px;height:6px;border-radius:50%;pointer-events:none;z-index:90}
-.pip-video{position:fixed;left:0;bottom:0;width:2px;height:2px;opacity:.01;pointer-events:none;z-index:-1}
 
 /* ===== picture-in-picture window ===== */
+.pip-video{position:fixed;left:0;bottom:0;width:2px;height:2px;opacity:.01;pointer-events:none;z-index:-1}
+.pip-video:fullscreen{opacity:1;width:100%;height:100%;object-fit:contain;background:var(--bg);pointer-events:auto}
+.pip-video:-webkit-full-screen{opacity:1;width:100%;height:100%;object-fit:contain;background:var(--bg);pointer-events:auto}
 .pip-body{height:100vh;overflow:hidden;-webkit-user-select:none;user-select:none}
-.pip{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(10px,4vh,22px);padding:clamp(12px,5vh,26px) 16px}
-.pip .ring-wrap{width:clamp(120px,min(86vw,calc(100vh - 196px)),560px)}
+.pip{height:100%;display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto auto minmax(0,1fr) auto;
+  grid-template-areas:"top" "ring" "ctrl" "tasks" "foot";justify-items:center;align-content:start;gap:14px;padding:16px}
+.pip-top{grid-area:top;width:100%;display:flex;justify-content:center}
+.pip .seg{width:100%;max-width:340px}
+.pip .seg button{flex:1;height:30px;padding:0 6px;font-size:13px}
+.pip .seg button.pending{color:var(--mode);box-shadow:inset 0 0 0 1.5px rgba(var(--mode-rgb),.55)}
+.pip .ring-wrap{grid-area:ring;width:clamp(110px,min(calc(100vw - 72px),calc(100vh - 420px)),400px)}
 .pip .mode-label{font-size:max(10px,4.4cqi)}
 .pip .status{font-size:max(11px,5cqi);height:auto}
-.pip-side{display:flex;flex-direction:column;align-items:center;gap:clamp(10px,4vh,20px);min-width:0;width:100%}
-.pip .controls{gap:16px}
+.pip .controls{grid-area:ctrl;gap:16px}
 .pip .ctrl.ghost{width:44px;height:44px}
 .pip .ctrl.ghost svg{width:18px;height:18px}
-.pip .ctrl.primary{width:62px;height:62px}
-.pip .ctrl.primary svg{width:24px;height:24px}
-.pip-task{display:flex;align-items:center;gap:10px;width:min(100%,360px);padding:8px 14px 8px 9px;border-radius:15px;background:var(--surface);border:1px solid var(--line);font-size:14px}
-.pip-task .check{width:22px;height:22px}
-.pip-task .check svg{width:13px;height:13px}
-.pip-task-text{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:linear-gradient(currentColor,currentColor) no-repeat 0 56%/0 1.5px;transition:background-size .45s var(--ease),color .45s var(--ease)}
-.pip-task.done .pip-task-text{color:var(--text-3);background-size:100% 1.5px}
-@media (max-height:330px){.pip-task{display:none}.pip .ring-wrap{width:clamp(110px,min(86vw,calc(100vh - 120px)),560px)}}
-@media (max-height:250px){.pip .status{display:none}}
-@media (min-aspect-ratio:5/4){
-  .pip{flex-direction:row;gap:6vw;padding:16px 6vw}
-  .pip .ring-wrap{width:clamp(110px,min(48vw,calc(100vh - 36px)),560px)}
-  .pip-side{width:auto;flex:1;max-width:340px}
-  @media (max-height:330px){.pip .ring-wrap{width:clamp(110px,min(48vw,calc(100vh - 36px)),560px)}}
+.pip .ctrl.primary{width:60px;height:60px}
+.pip .ctrl.primary svg{width:23px;height:23px}
+.pip-tasks{grid-area:tasks;width:100%;min-height:0;display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:10px 6px 6px}
+.pip-tasks-head{display:flex;justify-content:space-between;align-items:baseline;padding:2px 10px 6px}
+.pip-tasks-head span:first-child{font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--text-3)}
+.pip-left{font-size:12.5px;color:var(--text-2);font-variant-numeric:tabular-nums}
+.pip-list{list-style:none;margin:0;padding:0 2px 6px;overflow-y:auto;flex:1 1 auto;min-height:0;scrollbar-width:none;overscroll-behavior:contain;
+  -webkit-mask-image:linear-gradient(#000 calc(100% - 22px),transparent);mask-image:linear-gradient(#000 calc(100% - 22px),transparent)}
+.pip-list::-webkit-scrollbar{display:none}
+.pip-list .task{padding:8px;gap:10px;border-radius:12px;align-items:center}
+.pip-list .check{width:22px;height:22px}
+.pip-list .check svg{width:13px;height:13px}
+.pip-list .task-body{font-size:14px;line-height:20px;padding:0;cursor:default;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pip-list .del{display:none!important}
+.pip-empty{display:flex;align-items:center;gap:8px;padding:6px 10px 10px;font-size:13px;color:var(--text-3)}
+.pip-empty svg{width:16px;height:16px;color:#22C55E}
+.pip-add{display:flex;align-items:center;gap:8px;margin:4px 2px 0;padding:0 10px;height:38px;border-radius:12px;background:var(--surface-2);border:1px solid transparent;transition:border-color .25s,box-shadow .3s var(--ease)}
+.pip-add:focus-within{border-color:rgba(var(--accent-rgb),.5);box-shadow:0 0 0 3px rgba(var(--accent-rgb),.12)}
+.pip-add .add-icon svg{width:16px;height:16px}
+.pip-add input{flex:1;min-width:0;height:36px;border:0;outline:0;background:transparent;font-size:14px}
+.pip-add input::placeholder{color:var(--text-3)}
+.pip-foot{grid-area:foot;display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;padding:0 4px}
+.pip-today{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-2);white-space:nowrap}
+.pip-today b{display:inline-block;color:var(--text);font-weight:600;font-variant-numeric:tabular-nums}
+.pip-today b.bump{animation:bump .5s var(--spring)}
+.pip-today .dot,.today-pill .dot{width:8px;height:8px;border-radius:50%;background:#22C55E;box-shadow:0 0 0 3px rgba(34,197,94,.18);flex:none}
+.pip-plus{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px 0 10px;border-radius:999px;background:var(--surface-2);border:1px solid var(--line);
+  font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;transition:transform .45s var(--spring),background-color .2s}
+.pip-plus svg{width:14px;height:14px;color:#22C55E}
+.pip-plus:active{transform:scale(.92)}
+@media (hover:hover){.pip-plus:hover{background:var(--surface-3)}}
+.pip-body .toast{bottom:12px;min-height:40px;font-size:13px;padding:4px 16px;gap:10px;max-width:calc(100% - 24px)}
+.pip-body .toast span{overflow:hidden;text-overflow:ellipsis}
+.pip-body .toast.has-action{padding-right:5px}
+.pip-body .toast button{height:30px;padding:0 12px}
+
+/* tall window, shrinking */
+@media (max-height:580px){
+  .pip{grid-template-rows:auto auto auto minmax(0,1fr);grid-template-areas:"top" "ring" "ctrl" "tasks"}
+  .pip-foot{display:none}
+  .pip .ring-wrap{width:clamp(110px,min(calc(100vw - 72px),calc(100vh - 390px)),400px)}
+}
+@media (max-height:460px){
+  .pip{grid-template-rows:auto auto auto;grid-template-areas:"top" "ring" "ctrl";align-content:center}
+  .pip-tasks{display:none}
+  .pip .ring-wrap{width:clamp(110px,min(calc(100vw - 72px),calc(100vh - 170px)),400px)}
+}
+@media (max-height:300px){
+  .pip{grid-template-areas:"ring" "ctrl";grid-template-rows:auto auto}
+  .pip-top{display:none}
+  .pip .ring-wrap{width:clamp(100px,min(calc(100vw - 72px),calc(100vh - 110px)),400px)}
+}
+@media (max-height:230px){.pip .status{display:none}}
+
+/* wide window: ring left, plan right */
+@media (min-aspect-ratio:6/5){
+  .pip{grid-template-columns:auto minmax(0,1fr);grid-template-rows:auto minmax(0,1fr) auto;
+    grid-template-areas:"ring top" "ring tasks" "ctrl foot";justify-items:stretch;align-items:start;align-content:stretch;column-gap:22px;row-gap:12px}
+  .pip .ring-wrap{width:clamp(100px,min(44vw,calc(100vh - 112px)),400px);justify-self:center;align-self:center}
+  .pip .controls{justify-self:center;align-self:center}
+  .pip-top{display:flex;justify-content:stretch}
+  .pip .seg{max-width:none}
+  .pip-tasks{display:flex;align-self:stretch}
+  .pip-foot{display:flex;align-self:center}
+}
+@media (min-aspect-ratio:6/5) and (max-height:330px){
+  .pip{grid-template-rows:minmax(0,1fr) auto;grid-template-areas:"ring tasks" "ctrl tasks"}
+  .pip-top,.pip-foot{display:none}
+  .pip .ring-wrap{width:clamp(100px,min(44vw,calc(100vh - 100px)),400px)}
+}
+@media (min-aspect-ratio:6/5) and (max-width:470px){
+  .pip{grid-template-rows:auto auto;grid-template-areas:"ring top" "ring ctrl";align-content:center}
+  .pip-tasks,.pip-foot{display:none}
+  .pip-top{display:flex}
+  .pip .controls{align-self:start}
 }
 
 /* intro */
@@ -870,21 +936,24 @@ async function lockScreen() {
 function unlockScreen() { if (wakeLock) { wakeLock.release().catch(() => {}); wakeLock = null; } }
 
 /* ---------- Toast ---------- */
-const toastEl = $('#toast'), toastMsg = $('#toastMsg'), toastBtn = $('#toastBtn');
+const toastViews = [{ el: $('#toast'), msg: $('#toastMsg'), btn: $('#toastBtn') }];
 let toastT = 0, toastAction = null;
 function toast(msg, { action, onAction, ms = 2800 } = {}) {
-  toastMsg.textContent = msg;
-  toastBtn.hidden = !action; toastEl.classList.toggle('has-action', !!action);
   toastAction = action ? onAction : null;
-  if (action) toastBtn.textContent = action;
-  if (toastEl.classList.contains('show') && toastEl.animate) {
-    toastEl.animate([{ transform: 'translate(-50%,0) scale(.96)' }, { transform: 'translate(-50%,0) scale(1)' }], { duration: 300, easing: 'cubic-bezier(.34,1.56,.64,1)' });
-  }
-  toastEl.classList.add('show');
+  toastViews.forEach(v => {
+    v.msg.textContent = msg;
+    v.btn.hidden = !action; v.el.classList.toggle('has-action', !!action);
+    if (action) v.btn.textContent = action;
+    if (v.el.classList.contains('show') && v.el.animate) {
+      v.el.animate([{ transform: 'translate(-50%,0) scale(.96)' }, { transform: 'translate(-50%,0) scale(1)' }], { duration: 300, easing: 'cubic-bezier(.34,1.56,.64,1)' });
+    }
+    v.el.classList.add('show');
+  });
   clearTimeout(toastT); toastT = setTimeout(hideToast, action ? 5000 : ms);
 }
-function hideToast() { toastEl.classList.remove('show'); toastAction = null; }
-toastBtn.addEventListener('click', () => { const f = toastAction; hideToast(); f && f(); });
+function hideToast() { toastViews.forEach(v => v.el.classList.remove('show')); toastAction = null; }
+function runToastAction() { const f = toastAction; hideToast(); f && f(); }
+toastViews[0].btn.addEventListener('click', runToastAction);
 
 /* ---------- Press-and-hold repeat ---------- */
 function holdRepeat(btn, fn) {
@@ -1324,15 +1393,19 @@ taskList.addEventListener('click', e => {
   else if (e.target.closest('.task-body') && !li.classList.contains('editing')) beginEdit(li);
 });
 addInput.addEventListener('input', () => addForm.classList.toggle('has-text', addInput.value.trim().length > 0));
-addForm.addEventListener('submit', e => {
-  e.preventDefault();
-  const v = addInput.value.replace(/\s+/g, ' ').trim(); if (!v) return;
-  addInput.value = ''; addForm.classList.remove('has-text');
-  const t = { id: uid(), text: v, order: (tasks.length ? Math.max(...tasks.map(x => x.order)) : 0) + 1, created: Date.now() };
+function addTask(v) {
+  const t = { id: uid(), text: v.slice(0, 240), order: (tasks.length ? Math.max(...tasks.map(x => x.order)) : 0) + 1, created: Date.now() };
   tasks.push(t); safe(db.put('tasks', t));
   const li = taskEl(t); li.classList.add('enter'); taskList.appendChild(li);
   updateTaskCount(); haptic(8); uiSound('add');
   requestAnimationFrame(() => taskList.scrollTo({ top: taskList.scrollHeight, behavior: 'smooth' }));
+  return t;
+}
+addForm.addEventListener('submit', e => {
+  e.preventDefault();
+  const v = addInput.value.replace(/\s+/g, ' ').trim(); if (!v) return;
+  addInput.value = ''; addForm.classList.remove('has-text');
+  addTask(v);
 });
 function burst(doc, x, y) {
   const color = getComputedStyle(root).getPropertyValue('--accent').trim() || '#8B92FF';
@@ -1530,6 +1603,7 @@ function updateTodayPill(anim) {
   if (todayCountEl.textContent !== String(n) && anim) restartClass(todayCountEl, 'bump');
   todayCountEl.textContent = n;
   todayWord.textContent = n === 1 ? 'block today' : 'blocks today';
+  pipSync();
 }
 $('#todayPill').addEventListener('click', () => { haptic(6); openDayEditor(todayKey()); });
 
@@ -1554,19 +1628,26 @@ window.addEventListener('scroll', () => {
 }, { passive: true });
 
 /* ---------- Picture-in-picture ---------- */
-const pip = { mode: null, win: null, els: null, p: 1, video: null, canvas: null, ctx: null, track: null, colors: null, colorsKey: '',
-  lastKey: '', lastToggle: 0, taskLock: false, metaKey: '', rafId: 0, lastOff: -1, lastTxt: '' };
+const pip = { mode: null, fs: false, win: null, els: null, p: 1, video: null, canvas: null, ctx: null, track: null, colors: null, colorsKey: '',
+  lastKey: '', lastToggle: 0, locks: 0, taskSig: null, taskIds: [], metaKey: '', rafId: 0, lastOff: -1, lastTxt: '',
+  pendingMode: null, pendingT: 0, hintUntil: 0, toastView: null };
 const pipBtn = $('#pipBtn'), pipSetBtn = $('#pipSetBtn');
+const UA = navigator.userAgent;
 const canDocPip = 'documentPictureInPicture' in window;
+const hasCapture = typeof HTMLCanvasElement !== 'undefined' && typeof HTMLCanvasElement.prototype.captureStream === 'function';
 const canVideoPip = (() => {
   try {
     const v = document.createElement('video');
-    return typeof HTMLCanvasElement.prototype.captureStream === 'function' &&
-      ((document.pictureInPictureEnabled && typeof v.requestPictureInPicture === 'function') || typeof v.webkitSetPresentationMode === 'function');
+    return hasCapture && ((document.pictureInPictureEnabled && typeof v.requestPictureInPicture === 'function') || typeof v.webkitSetPresentationMode === 'function');
   } catch (e) { return false; }
 })();
-const canPip = canDocPip || canVideoPip;
-if (!canPip) { pipBtn.hidden = true; pipSetBtn.hidden = true; $('#pipHint').textContent = 'Not supported in this browser'; }
+const canFsPip = !canDocPip && !canVideoPip && hasCapture && /Android/i.test(UA) && typeof HTMLVideoElement.prototype.requestFullscreen === 'function';
+const canPip = canDocPip || canVideoPip || canFsPip;
+$('#pipHint').textContent = !canPip ? 'Not supported in this browser'
+  : canDocPip ? 'A small window with your timer and plan, always on top'
+  : canVideoPip ? 'A floating timer with play, skip and reset controls'
+  : 'Opens the timer full screen. Go Home and Android floats it';
+if (!canPip) { pipBtn.hidden = true; pipSetBtn.hidden = true; }
 const smooth = (a, b, k) => Math.abs(b - a) < 0.0015 ? b : a + (b - a) * k;
 
 function updatePipButtons() {
@@ -1580,27 +1661,35 @@ async function openPip() {
   haptic(8); uiSound('tap');
   if (canDocPip) { try { await openDocPip(); return; } catch (e) { console.warn('Document PiP failed', e); } }
   if (canVideoPip) { try { await openVideoPip(); return; } catch (e) { console.warn('Video PiP failed', e); } }
+  if (canFsPip) { try { await openFsPip(); return; } catch (e) { console.warn('Fullscreen PiP failed', e); } }
   toast('Picture-in-picture isn’t available here');
 }
 function closePip() {
-  if (pip.mode === 'doc' && pip.win) { try { pip.win.close(); } catch (e) {} }
-  else if (pip.mode === 'video') {
-    try {
+  try {
+    if (pip.mode === 'doc' && pip.win) pip.win.close();
+    else if (pip.mode === 'video') {
       if (document.pictureInPictureElement) document.exitPictureInPicture().catch(() => {});
       else if (pip.video && pip.video.webkitPresentationMode === 'picture-in-picture') pip.video.webkitSetPresentationMode('inline');
-    } catch (e) {}
-  }
+      if (pip.fs && document.fullscreenElement) document.exitFullscreen().catch(() => {});
+    }
+  } catch (e) {}
   pipCleanup();
 }
 function pipCleanup() {
   if (!pip.mode) return;
   if (pip.mode === 'doc' && pip.win) { try { pip.win.cancelAnimationFrame(pip.rafId); } catch (e) {} }
   if (pip.mode === 'video') clearMediaSession();
-  pip.mode = null; pip.win = null; pip.els = null; pip.lastKey = '';
+  if (pip.fs) { try { screen.orientation && screen.orientation.unlock && screen.orientation.unlock(); } catch (e) {} }
+  if (pip.toastView) { const i = toastViews.indexOf(pip.toastView); if (i > -1) toastViews.splice(i, 1); }
+  clearTimeout(pip.pendingT);
+  Object.assign(pip, { mode: null, fs: false, win: null, els: null, lastKey: '', locks: 0, taskSig: null, taskIds: [], pendingMode: null, toastView: null });
   updatePipButtons(); refreshTickRate();
 }
 
+/* ----- interactive window (desktop Chrome, Edge, Firefox) ----- */
+const SVG_PLUS_SM = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>';
 const PIP_HTML = `<div class="pip">
+  <div class="pip-top"><div class="seg pip-seg no-anim"><span class="seg-ind"></span><button data-mode="focus">Focus</button><button data-mode="break">Break</button><button data-mode="custom">Custom</button></div></div>
   <div class="ring-wrap">
     <svg class="ring" viewBox="0 0 360 360" aria-hidden="true">
       <defs><linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" class="stop-a"/><stop offset="1" class="stop-b"/></linearGradient></defs>
@@ -1611,44 +1700,76 @@ const PIP_HTML = `<div class="pip">
     </svg>
     <div class="ring-center"><div class="mode-label"></div><div class="time"></div><div class="status"></div></div>
   </div>
-  <div class="pip-side">
-    <div class="controls">
-      <button class="ctrl ghost" data-act="reset" aria-label="Reset"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 12a8.5 8.5 0 1 0 2.6-6.1L3.5 8.5"/><path d="M3.5 3.5v5h5"/></svg></button>
-      <button class="ctrl primary" data-act="toggle" aria-label="Start"><svg class="i-play" viewBox="0 0 24 24"><path fill="currentColor" d="M7.5 5.2v13.6a1.2 1.2 0 0 0 1.82 1.03l11.05-6.8a1.2 1.2 0 0 0 0-2.06L9.32 4.17A1.2 1.2 0 0 0 7.5 5.2z"/></svg><svg class="i-pause" viewBox="0 0 24 24"><rect x="6" y="5" width="4.4" height="14" rx="1.5" fill="currentColor"/><rect x="13.6" y="5" width="4.4" height="14" rx="1.5" fill="currentColor"/></svg></button>
-      <button class="ctrl ghost" data-act="skip" aria-label="Skip"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M5 6.1v11.8a1.1 1.1 0 0 0 1.7.92l8.6-5.9a1.1 1.1 0 0 0 0-1.84L6.7 5.18A1.1 1.1 0 0 0 5 6.1z"/><rect x="17" y="5" width="2.4" height="14" rx="1.2" fill="currentColor"/></svg></button>
-    </div>
-    <div class="pip-task" hidden><button class="check" data-act="check" aria-label="Complete task">${CHECK_SVG}</button><span class="pip-task-text"></span></div>
+  <div class="controls">
+    <button class="ctrl ghost" data-act="reset" aria-label="Reset" title="Reset"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 12a8.5 8.5 0 1 0 2.6-6.1L3.5 8.5"/><path d="M3.5 3.5v5h5"/></svg></button>
+    <button class="ctrl primary" data-act="toggle" aria-label="Start"><svg class="i-play" viewBox="0 0 24 24"><path fill="currentColor" d="M7.5 5.2v13.6a1.2 1.2 0 0 0 1.82 1.03l11.05-6.8a1.2 1.2 0 0 0 0-2.06L9.32 4.17A1.2 1.2 0 0 0 7.5 5.2z"/></svg><svg class="i-pause" viewBox="0 0 24 24"><rect x="6" y="5" width="4.4" height="14" rx="1.5" fill="currentColor"/><rect x="13.6" y="5" width="4.4" height="14" rx="1.5" fill="currentColor"/></svg></button>
+    <button class="ctrl ghost" data-act="skip" aria-label="Skip" title="Skip"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M5 6.1v11.8a1.1 1.1 0 0 0 1.7.92l8.6-5.9a1.1 1.1 0 0 0 0-1.84L6.7 5.18A1.1 1.1 0 0 0 5 6.1z"/><rect x="17" y="5" width="2.4" height="14" rx="1.2" fill="currentColor"/></svg></button>
+  </div>
+  <section class="pip-tasks">
+    <div class="pip-tasks-head"><span>Plan</span><span class="pip-left"></span></div>
+    <ul class="pip-list"></ul>
+    <div class="pip-empty" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8.5 12.3l2.4 2.4 4.6-5.2"/></svg>All clear</div>
+    <form class="pip-add" autocomplete="off"><span class="add-icon">${SVG_PLUS_SM}</span><input type="text" placeholder="Add a task" maxlength="240" aria-label="New task"></form>
+  </section>
+  <div class="pip-foot">
+    <div class="pip-today"><span class="dot"></span><span><b class="pip-today-n">0</b> <span class="pip-today-w">blocks today</span></span></div>
+    <button class="pip-plus" data-act="log" title="Add one block to today">${SVG_PLUS_SM}Log block</button>
   </div>
 </div>`;
 
 async function openDocPip() {
-  const win = await window.documentPictureInPicture.requestWindow({ width: 320, height: 420 });
+  const win = await window.documentPictureInPicture.requestWindow({ width: 360, height: 620 });
   const d = win.document;
   d.documentElement.lang = 'en';
   ['#fontCss', '#appCss'].forEach(sel => { const s = $(sel); if (s) { const c = d.createElement('style'); c.textContent = s.textContent; d.head.appendChild(c); } });
   const meta = d.createElement('meta'); meta.name = 'color-scheme'; meta.content = 'dark light'; d.head.appendChild(meta);
   d.title = 'Chronos 2';
-  d.body.className = 'pip-body';
+  d.body.className = 'pip-body ready';
   d.body.innerHTML = PIP_HTML;
   const els = {
     root: d.documentElement, body: d.body, wrap: $('.ring-wrap', d), prog: $('.progress', d), knob: $('.knob', d),
-    time: $('.time', d), label: $('.mode-label', d), status: $('.status', d), task: $('.pip-task', d), taskText: $('.pip-task-text', d),
-    play: $('[data-act=toggle]', d), reset: $('[data-act=reset]', d)
+    time: $('.time', d), label: $('.mode-label', d), status: $('.status', d), seg: $('.pip-seg', d),
+    list: $('.pip-list', d), left: $('.pip-left', d), empty: $('.pip-empty', d), add: $('.pip-add', d), input: $('.pip-add input', d),
+    todayN: $('.pip-today-n', d), todayW: $('.pip-today-w', d), play: $('[data-act=toggle]', d), reset: $('[data-act=reset]', d)
   };
   els.prog.style.strokeDasharray = C;
+
+  const tv = d.createElement('div'); tv.className = 'toast'; tv.setAttribute('role', 'status');
+  tv.innerHTML = '<span></span><button hidden></button>'; d.body.appendChild(tv);
+  pip.toastView = { el: tv, msg: tv.firstChild, btn: tv.lastChild };
+  pip.toastView.btn.addEventListener('click', runToastAction);
+  toastViews.push(pip.toastView);
+
   d.body.addEventListener('click', e => {
+    const modeBtn = e.target.closest('.pip-seg button[data-mode]');
+    if (modeBtn) { pipSetMode(modeBtn.dataset.mode); return; }
+    const check = e.target.closest('.pip-list .check');
+    if (check) { pipCheck(check.closest('.task')); return; }
     const b = e.target.closest('[data-act]'); if (!b) return;
     const a = b.dataset.act;
-    if (a === 'toggle') toggle(); else if (a === 'reset') reset(); else if (a === 'skip') skip(); else if (a === 'check') pipCompleteTask();
+    if (a === 'toggle') toggle(); else if (a === 'reset') reset(); else if (a === 'skip') skip(); else if (a === 'log') pipLogBlock(b);
+  });
+  els.add.addEventListener('submit', e => {
+    e.preventDefault();
+    const v = els.input.value.replace(/\s+/g, ' ').trim(); if (!v) return;
+    els.input.value = ''; addTask(v);
+    requestAnimationFrame(() => els.list.scrollTo({ top: els.list.scrollHeight, behavior: 'smooth' }));
   });
   d.addEventListener('keydown', e => {
+    if (e.target.closest && e.target.closest('input,textarea')) { if (e.key === 'Escape') e.target.blur(); return; }
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const k = e.key.toLowerCase();
     if (e.code === 'Space') { e.preventDefault(); toggle(); }
-    else if (e.key.toLowerCase() === 'r') reset();
-    else if (e.key.toLowerCase() === 's') skip();
+    else if (k === 'r') reset(); else if (k === 's') skip();
+    else if (k === 'n') { e.preventDefault(); els.input.focus(); }
+    else if (k === '1') pipSetMode('focus'); else if (k === '2') pipSetMode('break'); else if (k === '3') pipSetMode('custom');
   });
+  win.addEventListener('resize', () => positionInd(els.seg));
   win.addEventListener('pagehide', () => { if (pip.win === win) pipCleanup(); });
-  pip.win = win; pip.els = els; pip.mode = 'doc'; pip.p = targetProgress(); pip.lastOff = -1; pip.lastTxt = '';
+
+  Object.assign(pip, { win, els, mode: 'doc', fs: false, p: targetProgress(), lastOff: -1, lastTxt: '', taskSig: null, taskIds: [] });
   pipSync(); updatePipButtons(); refreshTickRate();
+  requestAnimationFrame(() => { positionInd(els.seg); win.requestAnimationFrame(() => els.seg.classList.remove('no-anim')); });
   pipLoop();
 }
 function pipLoop() {
@@ -1667,18 +1788,52 @@ function pipLoop() {
   if (T.running && remainingNow() <= 0) complete();
   pip.rafId = pip.win.requestAnimationFrame(pipLoop);
 }
-function pipCompleteTask() {
-  const t = tasks[0]; if (!t || pip.taskLock) return;
-  const li = $(`.task[data-id="${CSS.escape(t.id)}"]`, taskList); if (!li) return;
-  pip.taskLock = true;
-  pip.els && pip.els.task.classList.add('done');
-  if (pip.els) { const r = $('.check', pip.els.task).getBoundingClientRect(); burst(pip.win.document, r.left + r.width / 2, r.top + r.height / 2); }
-  completeTask(li, { silentBurst: true });
-  setTimeout(() => {
-    pip.taskLock = false;
-    if (pip.els) { pip.els.task.classList.remove('done'); pip.els.task.dataset.id = ''; }
-    pipSync();
-  }, 700);
+function pipSetMode(m) {
+  if (transitioning || !pip.els) return;
+  if (m === T.mode) { clearPending(); return; }
+  if (inProgress() && pip.pendingMode !== m) {
+    pip.pendingMode = m; haptic(6); uiSound('tap');
+    clearTimeout(pip.pendingT); pip.pendingT = setTimeout(() => { clearPending(); pipSync(); }, 2600);
+    pipSync(); return;
+  }
+  clearPending(); haptic(6); uiSound('tap');
+  setMode(m, { force: true });
+}
+function clearPending() { pip.pendingMode = null; clearTimeout(pip.pendingT); }
+function pipCheck(li) {
+  if (!li || li.classList.contains('done') || li.classList.contains('leaving')) return;
+  const id = li.dataset.id, mainLi = $(`.task[data-id="${CSS.escape(id)}"]`, taskList);
+  if (!mainLi) return;
+  pip.locks++;
+  li.classList.add('done');
+  const r = $('.check', li).getBoundingClientRect();
+  burst(pip.win.document, r.left + r.width / 2, r.top + r.height / 2);
+  completeTask(mainLi, { silentBurst: true });
+  setTimeout(() => collapse(li, () => { pip.locks = Math.max(0, pip.locks - 1); pipRenderTasks(); }), 620);
+}
+function pipLogBlock(btn) {
+  const k = todayKey(), prev = days.get(k) || 0;
+  incrementDay(k, 1); haptic(10); uiSound('check');
+  if (btn && pip.win) { const r = btn.getBoundingClientRect(); burst(pip.win.document, r.left + 18, r.top + r.height / 2); }
+  toast('Logged 1 block for today', { action: 'Undo', onAction: () => setDay(k, prev) });
+}
+function pipRenderTasks() {
+  const e = pip.els; if (!e || pip.locks) return;
+  const sig = tasks.map(t => t.id + '\u0001' + t.text).join('\u0002');
+  if (sig === pip.taskSig) return;
+  const first = pip.taskSig === null, prev = new Set(pip.taskIds), top = e.list.scrollTop;
+  e.list.innerHTML = '';
+  tasks.forEach(t => {
+    const li = taskEl(t);
+    $('.task-body', li).title = t.text;
+    if (!first && !prev.has(t.id)) li.classList.add('enter');
+    e.list.appendChild(li);
+  });
+  e.list.scrollTop = top;
+  pip.taskSig = sig; pip.taskIds = tasks.map(t => t.id);
+  const n = tasks.length;
+  e.left.textContent = n ? `${n} left` : '';
+  e.empty.hidden = n > 0;
 }
 function pipSync() {
   if (!pip.mode) return;
@@ -1689,32 +1844,31 @@ function pipSync() {
     e.body.dataset.mode = T.mode;
     e.body.classList.toggle('is-running', T.running);
     e.label.textContent = LABELS[T.mode];
-    e.status.textContent = lastStatus;
+    e.status.textContent = pip.pendingMode ? 'Tap again to switch' : lastStatus;
     e.play.setAttribute('aria-label', T.running ? 'Pause' : 'Start');
     e.reset.disabled = resetBtn.disabled;
-    if (!pip.taskLock) {
-      const t = tasks[0];
-      e.task.hidden = !t;
-      if (t && (e.task.dataset.id !== t.id || e.taskText.textContent !== t.text)) {
-        const isNew = e.task.dataset.id !== t.id;
-        e.task.dataset.id = t.id; e.taskText.textContent = t.text; e.task.title = t.text;
-        if (isNew && e.task.animate) e.task.animate([{ opacity: 0, transform: 'translateY(6px)' }, { opacity: 1, transform: 'none' }], { duration: 420, easing: EASE });
-      }
-    }
+    $$('button[data-mode]', e.seg).forEach(b => { b.classList.toggle('on', b.dataset.mode === T.mode); b.classList.toggle('pending', b.dataset.mode === pip.pendingMode); });
+    positionInd(e.seg);
+    const n = days.get(todayKey()) || 0;
+    if (e.todayN.textContent !== String(n)) { e.todayN.textContent = n; restartClass(e.todayN, 'bump'); }
+    e.todayW.textContent = n === 1 ? 'block today' : 'blocks today';
+    pipRenderTasks();
   } else if (pip.mode === 'video') {
     pipReadColors(); updateMediaSession(); drawPipCanvas(true);
   }
 }
 
-/* video fallback (iPad / Android / Safari): live canvas streamed into a PiP video */
+/* ----- floating video (iPad, Safari, Android) ----- */
+const VW = 960, VH = 540;
 function pipReadColors() {
   const cs = getComputedStyle(document.body), g = n => cs.getPropertyValue(n).trim();
-  pip.colors = { bg: g('--bg'), track: g('--surface-3'), mode: g('--mode'), mode2: g('--mode-2'), modeRgb: g('--mode-rgb'), text: g('--text'), text2: g('--text-2') };
+  pip.colors = { bg: g('--bg'), surface: g('--surface'), line: g('--line-2'), track: g('--surface-3'), mode: g('--mode'), mode2: g('--mode-2'),
+    modeRgb: g('--mode-rgb'), text: g('--text'), text2: g('--text-2'), text3: g('--text-3'), toastBg: g('--toast-bg'), toastFg: g('--toast-fg') };
   pip.colorsKey = Object.values(pip.colors).join('|');
 }
 function ensureVideo() {
   if (pip.video) return pip.video;
-  const c = document.createElement('canvas'); c.width = c.height = 540;
+  const c = document.createElement('canvas'); c.width = VW; c.height = VH;
   pip.canvas = c; pip.ctx = c.getContext('2d');
   pipReadColors(); drawPipCanvas(true);
   let stream = c.captureStream(0), track = stream.getVideoTracks()[0];
@@ -1725,21 +1879,18 @@ function ensureVideo() {
   v.setAttribute('muted', ''); v.setAttribute('playsinline', ''); v.className = 'pip-video'; v.setAttribute('aria-hidden', 'true');
   v.srcObject = stream;
   document.body.appendChild(v);
-  v.addEventListener('leavepictureinpicture', () => { if (pip.mode === 'video') pipCleanup(); });
+  v.addEventListener('leavepictureinpicture', () => { if (pip.mode === 'video' && !pip.fs) pipCleanup(); });
   v.addEventListener('webkitpresentationmodechanged', () => {
     if (v.webkitPresentationMode === 'picture-in-picture') { if (!pip.mode) { pip.mode = 'video'; setupMediaSession(); updatePipButtons(); refreshTickRate(); } }
-    else if (pip.mode === 'video') pipCleanup();
+    else if (pip.mode === 'video' && !pip.fs) pipCleanup();
   });
-  v.addEventListener('pause', () => {
-    if (pip.mode !== 'video') return;
-    pipUserToggle();
-    v.play().catch(() => {});
-  });
+  v.addEventListener('pause', () => { if (pip.mode !== 'video') return; pipUserToggle(); v.play().catch(() => {}); });
+  document.addEventListener('fullscreenchange', () => { if (pip.fs && pip.mode === 'video' && document.fullscreenElement !== v) pipCleanup(); });
   pip.video = v;
   v.play().catch(() => {});
   return v;
 }
-if (!canDocPip && canVideoPip) window.addEventListener('pointerdown', () => { try { ensureVideo(); } catch (e) {} }, { once: true, capture: true });
+if (!canDocPip && (canVideoPip || canFsPip)) window.addEventListener('pointerdown', () => { try { ensureVideo(); } catch (e) {} }, { once: true, capture: true });
 async function openVideoPip() {
   const v = ensureVideo();
   pipReadColors(); pip.p = targetProgress(); drawPipCanvas(true);
@@ -1747,7 +1898,18 @@ async function openVideoPip() {
   if (v.readyState < 1) await new Promise((res, rej) => { v.addEventListener('loadedmetadata', res, { once: true }); setTimeout(() => rej(new Error('video not ready')), 3000); });
   if (document.pictureInPictureEnabled && typeof v.requestPictureInPicture === 'function') await v.requestPictureInPicture();
   else v.webkitSetPresentationMode('picture-in-picture');
-  pip.mode = 'video';
+  pip.mode = 'video'; pip.fs = false;
+  setupMediaSession(); updatePipButtons(); refreshTickRate(); pipSync();
+}
+async function openFsPip() {
+  const v = ensureVideo();
+  pipReadColors(); pip.p = targetProgress();
+  if (v.paused) v.play().catch(() => {});
+  pip.mode = 'video'; pip.fs = true; pip.hintUntil = Date.now() + 6000;
+  drawPipCanvas(true);
+  try { await v.requestFullscreen({ navigationUI: 'hide' }); }
+  catch (e) { pip.mode = null; pip.fs = false; throw e; }
+  try { if (screen.orientation && screen.orientation.lock) screen.orientation.lock('landscape').catch(() => {}); } catch (e) {}
   setupMediaSession(); updatePipButtons(); refreshTickRate(); pipSync();
 }
 function pipUserToggle() {
@@ -1772,10 +1934,12 @@ function updateMediaSession() {
   if (pip.mode !== 'video' || !('mediaSession' in navigator)) return;
   const ms = navigator.mediaSession;
   try { ms.playbackState = T.running ? 'playing' : 'paused'; } catch (e) {}
-  const key = T.mode + iconPng.length;
+  const n = tasks.length;
+  const artist = n ? `${n} task${n === 1 ? '' : 's'} left · next: ${tasks[0].text}` : 'All clear';
+  const key = T.mode + artist + iconPng.length;
   if (key === pip.metaKey || !window.MediaMetadata) return;
   pip.metaKey = key;
-  try { ms.metadata = new MediaMetadata({ title: LABELS[T.mode], artist: 'Chronos 2', artwork: iconPng ? [{ src: iconPng, sizes: '192x192', type: 'image/png' }] : [] }); } catch (e) {}
+  try { ms.metadata = new MediaMetadata({ title: LABELS[T.mode], artist, album: 'Chronos 2', artwork: iconPng ? [{ src: iconPng, sizes: '192x192', type: 'image/png' }] : [] }); } catch (e) {}
 }
 function clearMediaSession() {
   if (!('mediaSession' in navigator)) return;
@@ -1789,25 +1953,48 @@ function drawMono(x, s, cx, cy) {
   let left = cx - widths.reduce((a, b) => a + b, 0) / 2;
   [...s].forEach((ch, i) => { x.fillText(ch, left + widths[i] / 2, cy); left += widths[i]; });
 }
-function drawSpaced(x, s, cx, cy, sp) {
+function drawSpaced(x, s, left, cy, sp, center) {
   const chars = [...s], ws = chars.map(ch => x.measureText(ch).width);
-  let left = cx - (ws.reduce((a, b) => a + b, 0) + sp * (chars.length - 1)) / 2;
+  if (center) left -= (ws.reduce((a, b) => a + b, 0) + sp * (chars.length - 1)) / 2;
   chars.forEach((ch, i) => { x.fillText(ch, left + ws[i] / 2, cy); left += ws[i] + sp; });
+}
+function wrapLines(x, text, maxW, maxLines) {
+  const lines = [];
+  let cur = '';
+  text.split(/\s+/).forEach(w => {
+    const t = cur ? cur + ' ' + w : w;
+    if (!cur || x.measureText(t).width <= maxW) cur = t; else { lines.push(cur); cur = w; }
+  });
+  if (cur) lines.push(cur);
+  const out = lines.slice(0, maxLines), cut = lines.length > maxLines;
+  return out.map((l, i) => {
+    if (!((i === out.length - 1 && cut) || x.measureText(l).width > maxW)) return l;
+    while (l.length && x.measureText(l + '…').width > maxW) l = l.slice(0, -1);
+    return l.trimEnd() + '…';
+  });
+}
+function rrect(x, X, Y, w, h, r) {
+  x.beginPath();
+  if (x.roundRect) { x.roundRect(X, Y, w, h, r); return; }
+  x.moveTo(X + r, Y); x.arcTo(X + w, Y, X + w, Y + h, r); x.arcTo(X + w, Y + h, X, Y + h, r); x.arcTo(X, Y + h, X, Y, r); x.arcTo(X, Y, X + w, Y, r); x.closePath();
 }
 function drawPipCanvas(force) {
   const c = pip.canvas; if (!c || !pip.colors) return;
   pip.p = smooth(pip.p, targetProgress(), .35);
-  const txt = fmt(remainingNow()), st = lastStatus;
-  const key = pip.p.toFixed(4) + txt + st + T.mode + T.running + pip.colorsKey;
+  const txt = fmt(remainingNow()), st = lastStatus, n = tasks.length, next = n ? tasks[0].text : '', today = days.get(todayKey()) || 0;
+  const hint = pip.fs && Date.now() < pip.hintUntil && !document.pictureInPictureElement;
+  const key = [pip.p.toFixed(4), txt, st, T.mode, T.running, pip.colorsKey, n, next, today, hint].join('|');
   if (!force && key === pip.lastKey) return;
   pip.lastKey = key;
-  const x = pip.ctx, W = c.width, cx = W / 2, cy = W / 2, k = pip.colors;
-  x.clearRect(0, 0, W, W);
-  x.fillStyle = k.bg; x.fillRect(0, 0, W, W);
-  const g = x.createRadialGradient(cx, cy, 0, cx, cy, W * .5);
-  g.addColorStop(0, `rgba(${k.modeRgb},${T.running ? .18 : .08})`); g.addColorStop(1, `rgba(${k.modeRgb},0)`);
-  x.fillStyle = g; x.fillRect(0, 0, W, W);
-  const r = W * .38, lw = W * .04;
+  const x = pip.ctx, k = pip.colors, F = 'Inter, system-ui, sans-serif';
+  x.clearRect(0, 0, VW, VH);
+  x.fillStyle = k.bg; x.fillRect(0, 0, VW, VH);
+  const cx = 270, cy = 270, r = 192, lw = 20;
+  const g = x.createRadialGradient(cx, cy, 0, cx, cy, 330);
+  g.addColorStop(0, `rgba(${k.modeRgb},${T.running ? .2 : .09})`); g.addColorStop(1, `rgba(${k.modeRgb},0)`);
+  x.fillStyle = g; x.fillRect(0, 0, VW, VH);
+
+  // ring
   x.lineWidth = lw; x.strokeStyle = k.track; x.beginPath(); x.arc(cx, cy, r, 0, Math.PI * 2); x.stroke();
   const p = pip.p;
   if (p > 0.0005) {
@@ -1816,14 +2003,44 @@ function drawPipCanvas(force) {
     x.strokeStyle = lg; x.lineCap = 'round'; x.beginPath(); x.arc(cx, cy, r, -Math.PI / 2, -Math.PI / 2 + p * Math.PI * 2); x.stroke();
   }
   const a = p * Math.PI * 2;
-  x.fillStyle = '#fff'; x.beginPath(); x.arc(cx + r * Math.sin(a), cy - r * Math.cos(a), lw * .55, 0, Math.PI * 2); x.fill();
+  x.fillStyle = '#fff'; x.beginPath(); x.arc(cx + r * Math.sin(a), cy - r * Math.cos(a), 11, 0, Math.PI * 2); x.fill();
   x.textAlign = 'center'; x.textBaseline = 'middle';
-  x.fillStyle = k.mode; x.font = `600 ${Math.round(W * .036)}px Inter, system-ui, sans-serif`;
-  drawSpaced(x, LABELS[T.mode].toUpperCase(), cx, cy - W * .14, W * .007);
-  x.fillStyle = k.text; x.font = `300 ${Math.round(W * (txt.length > 5 ? .15 : .19))}px Inter, system-ui, sans-serif`;
-  drawMono(x, txt, cx, cy + W * .01);
-  x.fillStyle = k.text2; x.font = `400 ${Math.round(W * .038)}px Inter, system-ui, sans-serif`;
-  x.fillText(st, cx, cy + W * .145);
+  x.fillStyle = k.mode; x.font = `600 24px ${F}`;
+  drawSpaced(x, LABELS[T.mode].toUpperCase(), cx, cy - 76, 5, true);
+  x.fillStyle = k.text; x.font = `300 ${txt.length > 5 ? 90 : 112}px ${F}`;
+  drawMono(x, txt, cx, cy + 4);
+  x.fillStyle = k.text2; x.font = `400 24px ${F}`;
+  x.fillText(st, cx, cy + 78);
+
+  // plan card
+  const X = 516, Y = 62, CW = 400, CH = 416, P = 34, inner = CW - P * 2;
+  rrect(x, X, Y, CW, CH, 30); x.fillStyle = k.surface; x.fill();
+  x.lineWidth = 1.5; x.strokeStyle = k.line; x.stroke();
+  x.textAlign = 'left';
+  x.fillStyle = k.text3; x.font = `600 19px ${F}`;
+  x.textAlign = 'center'; drawSpaced(x, n ? 'UP NEXT' : 'PLAN', X + P, Y + 52, 3.5, false); x.textAlign = 'left';
+  if (n) {
+    x.fillStyle = k.text; x.font = `500 34px ${F}`;
+    wrapLines(x, next, inner, 2).forEach((l, i) => x.fillText(l, X + P, Y + 104 + i * 44));
+  } else {
+    x.fillStyle = k.text; x.font = `500 34px ${F}`; x.fillText('All clear', X + P, Y + 104);
+    x.fillStyle = k.text2; x.font = `400 22px ${F}`; x.fillText('Nothing left in your plan', X + P, Y + 146);
+  }
+  x.fillStyle = k.line; x.fillRect(X + P, Y + 228, inner, 1.5);
+  const col2 = X + P + inner / 2;
+  x.fillStyle = k.text; x.font = `600 56px ${F}`;
+  x.fillText(String(n), X + P, Y + 298); x.fillText(String(today), col2, Y + 298);
+  x.fillStyle = k.text2; x.font = `400 22px ${F}`;
+  x.fillText(n === 1 ? 'task left' : 'tasks left', X + P, Y + 350);
+  x.fillText(today === 1 ? 'block today' : 'blocks today', col2, Y + 350);
+
+  if (hint) {
+    const msg = 'Swipe Home to float this timer';
+    x.font = `500 22px ${F}`; const w = x.measureText(msg).width + 48;
+    const hx = X + CW / 2;
+    rrect(x, hx - w / 2, VH - 52, w, 40, 20); x.fillStyle = k.toastBg; x.fill();
+    x.fillStyle = k.toastFg; x.textAlign = 'center'; x.fillText(msg, hx, VH - 32);
+  }
   if (pip.track) { try { pip.track.requestFrame(); } catch (e) {} }
 }
 pipBtn.addEventListener('click', togglePip);
