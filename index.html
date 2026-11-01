@@ -169,6 +169,7 @@ button.time:not(:disabled):active{transform:scale(.96)}
 .today-pill{display:inline-flex;align-items:center;gap:8px;height:34px;padding:0 14px 0 12px;border-radius:999px;font-size:13px;
   color:var(--text-2);background:var(--surface-2);border:1px solid var(--line);transition:transform .45s var(--spring),color .2s}
 .today-pill:active{transform:scale(.94)}
+.today-pill .dot{width:8px;height:8px;border-radius:50%;background:#22C55E;box-shadow:0 0 0 3px rgba(34,197,94,.18);flex:none}
 .today-pill b{display:inline-block;color:var(--text);font-weight:600;font-variant-numeric:tabular-nums}
 .today-pill b.bump{animation:bump .5s var(--spring)}
 
@@ -396,25 +397,33 @@ kbd{font:600 11px var(--font);padding:2px 6px;border-radius:6px;background:var(-
 .toast button:active{transform:scale(.94)}
 .spark{position:fixed;width:6px;height:6px;border-radius:50%;pointer-events:none;z-index:90}
 
-/* ===== picture-in-picture window ===== */
+/* ===== mini view: picture-in-picture window and compact mode ===== */
 .pip-video{position:fixed;left:0;bottom:0;width:2px;height:2px;opacity:.01;pointer-events:none;z-index:-1}
 .pip-video:fullscreen{opacity:1;width:100%;height:100%;object-fit:contain;background:var(--bg);pointer-events:auto}
 .pip-video:-webkit-full-screen{opacity:1;width:100%;height:100%;object-fit:contain;background:var(--bg);pointer-events:auto}
 .pip-body{height:100vh;overflow:hidden;-webkit-user-select:none;user-select:none}
-.pip{height:100%;display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto auto minmax(0,1fr) auto;
-  grid-template-areas:"top" "ring" "ctrl" "tasks" "foot";justify-items:center;align-content:start;gap:14px;padding:16px}
-.pip-top{grid-area:top;width:100%;display:flex;justify-content:center}
-.pip .seg{width:100%;max-width:340px}
+body.mini{overflow:hidden}
+body.mini .screen,body.mini .calendar{display:none}
+.mini-host{position:fixed;inset:0;z-index:5;height:100vh;height:100svh;overflow:hidden;animation:fadeIn .4s var(--ease)}
+.mini-host .pip{padding:max(14px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) max(14px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left))}
+.pip{height:100%;display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto auto minmax(0,1fr);
+  grid-template-areas:"top" "ring" "ctrl" "tasks";justify-items:center;align-content:start;gap:14px;padding:16px}
+.pip-top{grid-area:top;width:100%;display:flex;align-items:center;justify-content:center;gap:8px}
+.pip .seg{flex:1;max-width:340px}
 .pip .seg button{flex:1;height:30px;padding:0 6px;font-size:13px}
 .pip .seg button.pending{color:var(--mode);box-shadow:inset 0 0 0 1.5px rgba(var(--mode-rgb),.55)}
-.pip .ring-wrap{grid-area:ring;width:clamp(110px,min(calc(100vw - 72px),calc(100vh - 420px)),400px)}
+.mini-gear{flex:none;width:40px;height:40px;border-radius:13px;display:grid;place-items:center;color:var(--text-2);background:var(--surface);border:1px solid var(--line);transition:transform .45s var(--spring),color .2s}
+.mini-gear svg{width:18px;height:18px}
+.mini-gear:active{transform:scale(.88)}
+@media (hover:hover){.mini-gear:hover{color:var(--text)}}
+.pip .ring-wrap{grid-area:ring;width:clamp(110px,min(calc(100vw - 72px),calc(100vh - 372px)),400px)}
 .pip .mode-label{font-size:max(10px,4.4cqi)}
 .pip .status{font-size:max(11px,5cqi);height:auto}
 .pip .controls{grid-area:ctrl;gap:16px}
-.pip .ctrl.ghost{width:44px;height:44px}
+.pip .ctrl.ghost{width:46px;height:46px}
 .pip .ctrl.ghost svg{width:18px;height:18px}
-.pip .ctrl.primary{width:60px;height:60px}
-.pip .ctrl.primary svg{width:23px;height:23px}
+.pip .ctrl.primary{width:62px;height:62px}
+.pip .ctrl.primary svg{width:24px;height:24px}
 .pip-tasks{grid-area:tasks;width:100%;min-height:0;display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:10px 6px 6px}
 .pip-tasks-head{display:flex;justify-content:space-between;align-items:baseline;padding:2px 10px 6px}
 .pip-tasks-head span:first-child{font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--text-3)}
@@ -422,39 +431,24 @@ kbd{font:600 11px var(--font);padding:2px 6px;border-radius:6px;background:var(-
 .pip-list{list-style:none;margin:0;padding:0 2px 6px;overflow-y:auto;flex:1 1 auto;min-height:0;scrollbar-width:none;overscroll-behavior:contain;
   -webkit-mask-image:linear-gradient(#000 calc(100% - 22px),transparent);mask-image:linear-gradient(#000 calc(100% - 22px),transparent)}
 .pip-list::-webkit-scrollbar{display:none}
-.pip-list .task{padding:8px;gap:10px;border-radius:12px;align-items:center}
-.pip-list .check{width:22px;height:22px}
-.pip-list .check svg{width:13px;height:13px}
-.pip-list .task-body{font-size:14px;line-height:20px;padding:0;cursor:default;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pip-list .task{padding:9px 8px;gap:10px;border-radius:12px;align-items:center}
+.pip-list .check{width:24px;height:24px}
+.pip-list .check svg{width:14px;height:14px}
+.pip-list .task-body{font-size:14.5px;line-height:20px;padding:0;cursor:default;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pip-list .del{display:none!important}
 .pip-empty{display:flex;align-items:center;gap:8px;padding:6px 10px 10px;font-size:13px;color:var(--text-3)}
 .pip-empty svg{width:16px;height:16px;color:#22C55E}
-.pip-add{display:flex;align-items:center;gap:8px;margin:4px 2px 0;padding:0 10px;height:38px;border-radius:12px;background:var(--surface-2);border:1px solid transparent;transition:border-color .25s,box-shadow .3s var(--ease)}
+.pip-add{display:flex;align-items:center;gap:8px;margin:4px 2px 0;padding:0 10px;height:40px;border-radius:12px;background:var(--surface-2);border:1px solid transparent;transition:border-color .25s,box-shadow .3s var(--ease)}
 .pip-add:focus-within{border-color:rgba(var(--accent-rgb),.5);box-shadow:0 0 0 3px rgba(var(--accent-rgb),.12)}
 .pip-add .add-icon svg{width:16px;height:16px}
-.pip-add input{flex:1;min-width:0;height:36px;border:0;outline:0;background:transparent;font-size:14px}
+.pip-add input{flex:1;min-width:0;height:38px;border:0;outline:0;background:transparent;font-size:14.5px}
 .pip-add input::placeholder{color:var(--text-3)}
-.pip-foot{grid-area:foot;display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;padding:0 4px}
-.pip-today{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-2);white-space:nowrap}
-.pip-today b{display:inline-block;color:var(--text);font-weight:600;font-variant-numeric:tabular-nums}
-.pip-today b.bump{animation:bump .5s var(--spring)}
-.pip-today .dot,.today-pill .dot{width:8px;height:8px;border-radius:50%;background:#22C55E;box-shadow:0 0 0 3px rgba(34,197,94,.18);flex:none}
-.pip-plus{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px 0 10px;border-radius:999px;background:var(--surface-2);border:1px solid var(--line);
-  font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;transition:transform .45s var(--spring),background-color .2s}
-.pip-plus svg{width:14px;height:14px;color:#22C55E}
-.pip-plus:active{transform:scale(.92)}
-@media (hover:hover){.pip-plus:hover{background:var(--surface-3)}}
 .pip-body .toast{bottom:12px;min-height:40px;font-size:13px;padding:4px 16px;gap:10px;max-width:calc(100% - 24px)}
 .pip-body .toast span{overflow:hidden;text-overflow:ellipsis}
 .pip-body .toast.has-action{padding-right:5px}
 .pip-body .toast button{height:30px;padding:0 12px}
 
 /* tall window, shrinking */
-@media (max-height:580px){
-  .pip{grid-template-rows:auto auto auto minmax(0,1fr);grid-template-areas:"top" "ring" "ctrl" "tasks"}
-  .pip-foot{display:none}
-  .pip .ring-wrap{width:clamp(110px,min(calc(100vw - 72px),calc(100vh - 390px)),400px)}
-}
 @media (max-height:460px){
   .pip{grid-template-rows:auto auto auto;grid-template-areas:"top" "ring" "ctrl";align-content:center}
   .pip-tasks{display:none}
@@ -467,25 +461,24 @@ kbd{font:600 11px var(--font);padding:2px 6px;border-radius:6px;background:var(-
 }
 @media (max-height:230px){.pip .status{display:none}}
 
-/* wide window: ring left, plan right */
+/* wide window: ring and controls left, modes and plan right */
 @media (min-aspect-ratio:6/5){
   .pip{grid-template-columns:auto minmax(0,1fr);grid-template-rows:auto minmax(0,1fr) auto;
-    grid-template-areas:"ring top" "ring tasks" "ctrl foot";justify-items:stretch;align-items:start;align-content:stretch;column-gap:22px;row-gap:12px}
-  .pip .ring-wrap{width:clamp(100px,min(44vw,calc(100vh - 112px)),400px);justify-self:center;align-self:center}
+    grid-template-areas:"ring top" "ring tasks" "ctrl tasks";justify-items:stretch;align-items:start;align-content:stretch;column-gap:22px;row-gap:12px}
+  .pip .ring-wrap{width:clamp(100px,min(44vw,calc(100vh - 116px)),400px);justify-self:center;align-self:center}
   .pip .controls{justify-self:center;align-self:center}
-  .pip-top{display:flex;justify-content:stretch}
+  .pip-top{display:flex}
   .pip .seg{max-width:none}
   .pip-tasks{display:flex;align-self:stretch}
-  .pip-foot{display:flex;align-self:center}
 }
 @media (min-aspect-ratio:6/5) and (max-height:330px){
   .pip{grid-template-rows:minmax(0,1fr) auto;grid-template-areas:"ring tasks" "ctrl tasks"}
-  .pip-top,.pip-foot{display:none}
+  .pip-top{display:none}
   .pip .ring-wrap{width:clamp(100px,min(44vw,calc(100vh - 100px)),400px)}
 }
 @media (min-aspect-ratio:6/5) and (max-width:470px){
   .pip{grid-template-rows:auto auto;grid-template-areas:"ring top" "ring ctrl";align-content:center}
-  .pip-tasks,.pip-foot{display:none}
+  .pip-tasks{display:none}
   .pip-top{display:flex}
   .pip .controls{align-self:start}
 }
@@ -1166,7 +1159,7 @@ function reset() {
   T.running = false; clearTimeout(completionTimer); unlockScreen();
   T.remaining = T.duration; lastSec = -1; updateTime(T.remaining);
   animateTo(1); saveTimer(); updateUI(); haptic(10);
-  spin(resetBtn); spin(pip.els && pip.els.reset);
+  spin(resetBtn); eachView(v => spin(v.els.reset));
 }
 async function setMode(m, { force = false, autoStart = false, quiet = false } = {}) {
   if (!force) {
@@ -1182,7 +1175,7 @@ async function setMode(m, { force = false, autoStart = false, quiet = false } = 
   if (!autoStart) unlockScreen();
   lastSec = -1; updateTime(T.remaining);
   animateTo(1); updateUI(); saveTimer();
-  if (changed && !quiet) swapIn([timeText, modeLabel, pip.els && pip.els.time, pip.els && pip.els.label]);
+  if (changed && !quiet) { swapIn([timeText, modeLabel]); eachView(v => swapIn([v.els.time, v.els.label])); }
   if (autoStart) start();
 }
 function skip() {
@@ -1208,7 +1201,7 @@ function complete({ away = false } = {}) {
     playSound(settings.soundType);
     haptic([0, 160, 90, 160]);
     notify(finished === 'focus' ? 'Focus complete' : finished === 'break' ? 'Break over' : 'Session complete', msg);
-    [ringWrap, pip.els && pip.els.wrap].forEach(w => { if (!w) return; restartClass(w, 'complete'); setTimeout(() => w.classList.remove('complete'), 1400); });
+    [ringWrap, ...[...views].map(v => v.els.wrap)].forEach(w => { if (!w) return; restartClass(w, 'complete'); setTimeout(() => w.classList.remove('complete'), 1400); });
   }
   toast(msg);
   if (away) {
@@ -1627,10 +1620,175 @@ window.addEventListener('scroll', () => {
   scrollRaf = requestAnimationFrame(() => { scrollRaf = 0; scrollHint.style.opacity = String(clamp(1 - scrollY / 140, 0, 1)); });
 }, { passive: true });
 
+/* ---------- Mini view (picture-in-picture window + compact mode) ---------- */
+const SVG_PLUS_SM = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>';
+const SVG_GEAR = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7.5h16M4 16.5h16"/><circle cx="15" cy="7.5" r="2.6" fill="var(--surface)"/><circle cx="9" cy="16.5" r="2.6" fill="var(--surface)"/></svg>';
+const MINI_HTML = (gear, gid) => `<div class="pip">
+  <div class="pip-top"><div class="seg pip-seg no-anim"><span class="seg-ind"></span><button data-mode="focus">Focus</button><button data-mode="break">Break</button><button data-mode="custom">Custom</button></div>${gear ? `<button class="mini-gear" data-act="settings" aria-label="Settings">${SVG_GEAR}</button>` : ''}</div>
+  <div class="ring-wrap">
+    <svg class="ring" viewBox="0 0 360 360" aria-hidden="true">
+      <defs><linearGradient id="${gid}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" class="stop-a"/><stop offset="1" class="stop-b"/></linearGradient></defs>
+      <g class="ticks">${TICKS_HTML}</g>
+      <circle class="track" cx="180" cy="180" r="150"/>
+      <circle class="progress" cx="180" cy="180" r="150" transform="rotate(-90 180 180)"/>
+      <circle class="knob" cx="180" cy="30" r="8"/>
+    </svg>
+    <div class="ring-center"><div class="mode-label"></div>${gear ? '<button class="time" aria-label="Adjust session length"></button>' : '<div class="time"></div>'}<div class="status"></div></div>
+  </div>
+  <div class="controls">
+    <button class="ctrl ghost" data-act="reset" aria-label="Reset" title="Reset"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 12a8.5 8.5 0 1 0 2.6-6.1L3.5 8.5"/><path d="M3.5 3.5v5h5"/></svg></button>
+    <button class="ctrl primary" data-act="toggle" aria-label="Start"><svg class="i-play" viewBox="0 0 24 24"><path fill="currentColor" d="M7.5 5.2v13.6a1.2 1.2 0 0 0 1.82 1.03l11.05-6.8a1.2 1.2 0 0 0 0-2.06L9.32 4.17A1.2 1.2 0 0 0 7.5 5.2z"/></svg><svg class="i-pause" viewBox="0 0 24 24"><rect x="6" y="5" width="4.4" height="14" rx="1.5" fill="currentColor"/><rect x="13.6" y="5" width="4.4" height="14" rx="1.5" fill="currentColor"/></svg></button>
+    <button class="ctrl ghost" data-act="skip" aria-label="Skip" title="Skip"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M5 6.1v11.8a1.1 1.1 0 0 0 1.7.92l8.6-5.9a1.1 1.1 0 0 0 0-1.84L6.7 5.18A1.1 1.1 0 0 0 5 6.1z"/><rect x="17" y="5" width="2.4" height="14" rx="1.2" fill="currentColor"/></svg></button>
+  </div>
+  <section class="pip-tasks">
+    <div class="pip-tasks-head"><span>Plan</span><span class="pip-left"></span></div>
+    <ul class="pip-list"></ul>
+    <div class="pip-empty" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8.5 12.3l2.4 2.4 4.6-5.2"/></svg>All clear</div>
+    <form class="pip-add" autocomplete="off"><span class="add-icon">${SVG_PLUS_SM}</span><input type="text" placeholder="Add a task" maxlength="240" enterkeyhint="done" aria-label="New task"></form>
+  </section>
+</div>`;
+
+const views = new Set();
+class MiniView {
+  constructor(doc, win, host, { gear = false } = {}) {
+    this.doc = doc; this.win = win; this.host = host;
+    const gid = 'ringGrad' + Math.random().toString(36).slice(2, 8);
+    host.insertAdjacentHTML('beforeend', MINI_HTML(gear, gid));
+    this.root = host.lastElementChild;
+    const q = s => this.root.querySelector(s);
+    this.els = { wrap: q('.ring-wrap'), prog: q('.progress'), knob: q('.knob'), time: q('.time'), label: q('.mode-label'), status: q('.status'),
+      seg: q('.pip-seg'), list: q('.pip-list'), left: q('.pip-left'), empty: q('.pip-empty'), add: q('.pip-add'), input: q('.pip-add input'),
+      play: q('[data-act=toggle]'), reset: q('[data-act=reset]') };
+    this.els.prog.style.strokeDasharray = C;
+    this.els.prog.style.stroke = `url(#${gid})`;
+    Object.assign(this, { locks: 0, taskSig: null, taskIds: [], pendingMode: null, pendingT: 0, p: targetProgress(), lastOff: -1, lastTxt: '', alive: true });
+    this.root.addEventListener('click', e => {
+      const modeBtn = e.target.closest('.pip-seg button[data-mode]');
+      if (modeBtn) { this.setMode(modeBtn.dataset.mode); return; }
+      if (e.target.closest('button.time')) { openDurationEditor(); return; }
+      const check = e.target.closest('.pip-list .check');
+      if (check) { this.check(check.closest('.task')); return; }
+      const b = e.target.closest('[data-act]'); if (!b) return;
+      const a = b.dataset.act;
+      if (a === 'toggle') toggle(); else if (a === 'reset') reset(); else if (a === 'skip') skip();
+      else if (a === 'settings') { haptic(6); uiSound('tap'); openSettings(); }
+    });
+    this.els.add.addEventListener('submit', e => {
+      e.preventDefault();
+      const v = this.els.input.value.replace(/\s+/g, ' ').trim(); if (!v) return;
+      this.els.input.value = ''; addTask(v);
+      this.win.requestAnimationFrame(() => this.els.list.scrollTo({ top: this.els.list.scrollHeight, behavior: 'smooth' }));
+    });
+    views.add(this);
+    this.sync();
+    this.frame = this.frame.bind(this);
+    this.raf = win.requestAnimationFrame(this.frame);
+    win.requestAnimationFrame(() => { positionInd(this.els.seg); win.requestAnimationFrame(() => this.els.seg.classList.remove('no-anim')); });
+  }
+  frame() {
+    if (!this.alive) return;
+    this.p = smooth(this.p, targetProgress(), .16);
+    const e = this.els, off = C * (1 - this.p);
+    if (Math.abs(off - this.lastOff) > 0.05) {
+      this.lastOff = off;
+      e.prog.style.strokeDashoffset = off;
+      const a = this.p * Math.PI * 2;
+      e.knob.setAttribute('cx', (180 + 150 * Math.sin(a)).toFixed(2));
+      e.knob.setAttribute('cy', (180 - 150 * Math.cos(a)).toFixed(2));
+    }
+    const txt = fmt(remainingNow());
+    if (txt !== this.lastTxt) { this.lastTxt = txt; e.time.textContent = txt; e.time.classList.toggle('long', txt.length > 5); }
+    if (T.running && remainingNow() <= 0) complete();
+    this.raf = this.win.requestAnimationFrame(this.frame);
+  }
+  destroy() {
+    this.alive = false; views.delete(this);
+    try { this.win.cancelAnimationFrame(this.raf); } catch (e) {}
+    clearTimeout(this.pendingT);
+    this.root.remove();
+  }
+  setMode(m) {
+    if (transitioning) return;
+    if (m === T.mode) { this.clearPending(); this.sync(); return; }
+    if (inProgress() && this.pendingMode !== m) {
+      this.pendingMode = m; haptic(6); uiSound('tap');
+      clearTimeout(this.pendingT); this.pendingT = setTimeout(() => { this.clearPending(); this.sync(); }, 2600);
+      this.sync(); return;
+    }
+    this.clearPending(); haptic(6); uiSound('tap');
+    setMode(m, { force: true });
+  }
+  clearPending() { this.pendingMode = null; clearTimeout(this.pendingT); }
+  check(li) {
+    if (!li || li.classList.contains('done') || li.classList.contains('leaving')) return;
+    const mainLi = $(`.task[data-id="${CSS.escape(li.dataset.id)}"]`, taskList);
+    if (!mainLi) return;
+    this.locks++;
+    li.classList.add('done');
+    const r = $('.check', li).getBoundingClientRect();
+    burst(this.doc, r.left + r.width / 2, r.top + r.height / 2);
+    completeTask(mainLi, { silentBurst: true });
+    setTimeout(() => collapse(li, () => { this.locks = Math.max(0, this.locks - 1); this.renderTasks(); }), 620);
+  }
+  renderTasks() {
+    const e = this.els; if (this.locks) return;
+    const sig = tasks.map(t => t.id + '\u0001' + t.text).join('\u0002');
+    if (sig === this.taskSig) return;
+    const first = this.taskSig === null, prev = new Set(this.taskIds), top = e.list.scrollTop;
+    e.list.innerHTML = '';
+    tasks.forEach(t => {
+      const li = taskEl(t);
+      $('.task-body', li).title = t.text;
+      if (!first && !prev.has(t.id)) li.classList.add('enter');
+      e.list.appendChild(li);
+    });
+    e.list.scrollTop = top;
+    this.taskSig = sig; this.taskIds = tasks.map(t => t.id);
+    const n = tasks.length;
+    e.left.textContent = n ? `${n} left` : '';
+    e.empty.hidden = n > 0;
+  }
+  sync() {
+    if (!this.alive) return;
+    const e = this.els;
+    if (this.doc !== document) {
+      const r = this.doc.documentElement, b = this.doc.body;
+      r.dataset.theme = root.dataset.theme; r.style.cssText = root.style.cssText;
+      b.dataset.mode = T.mode; b.classList.toggle('is-running', T.running);
+    }
+    e.label.textContent = LABELS[T.mode];
+    const st = this.pendingMode ? 'Tap again to switch' : lastStatus;
+    e.status.textContent = this.doc !== document && st === 'Tap the time to set it' ? 'Ready' : st;
+    if (e.time.tagName === 'BUTTON') e.time.disabled = T.running;
+    e.play.setAttribute('aria-label', T.running ? 'Pause' : 'Start');
+    e.reset.disabled = !inProgress() || transitioning;
+    $$('button[data-mode]', e.seg).forEach(b => { b.classList.toggle('on', b.dataset.mode === T.mode); b.classList.toggle('pending', b.dataset.mode === this.pendingMode); });
+    positionInd(e.seg);
+    this.renderTasks();
+  }
+}
+const eachView = fn => views.forEach(v => { try { fn(v); } catch (e) {} });
+
+/* compact mode: small windows (pop-up / floating windows, split screen, phone landscape) */
+const miniMQ = matchMedia('(max-height: 560px), (max-width: 640px) and (max-height: 760px)');
+let mainMini = null;
+function applyMini() {
+  const want = miniMQ.matches;
+  if (want && !mainMini) {
+    const host = document.createElement('div'); host.className = 'mini-host';
+    document.body.appendChild(host); document.body.classList.add('mini');
+    mainMini = new MiniView(document, window, host, { gear: true });
+  } else if (!want && mainMini) {
+    const host = mainMini.host; mainMini.destroy(); host.remove(); mainMini = null;
+    document.body.classList.remove('mini');
+    requestAnimationFrame(positionAllInds);
+  }
+}
+(miniMQ.addEventListener ? miniMQ.addEventListener.bind(miniMQ, 'change') : miniMQ.addListener.bind(miniMQ))(applyMini);
+
 /* ---------- Picture-in-picture ---------- */
-const pip = { mode: null, fs: false, win: null, els: null, p: 1, video: null, canvas: null, ctx: null, track: null, colors: null, colorsKey: '',
-  lastKey: '', lastToggle: 0, locks: 0, taskSig: null, taskIds: [], metaKey: '', rafId: 0, lastOff: -1, lastTxt: '',
-  pendingMode: null, pendingT: 0, hintUntil: 0, toastView: null };
+const pip = { mode: null, fs: false, win: null, view: null, p: 1, video: null, canvas: null, ctx: null, track: null, colors: null, colorsKey: '',
+  lastKey: '', lastToggle: 0, metaKey: '', hintUntil: 0, toastView: null };
 const pipBtn = $('#pipBtn'), pipSetBtn = $('#pipSetBtn');
 const UA = navigator.userAgent;
 const canDocPip = 'documentPictureInPicture' in window;
@@ -1645,7 +1803,7 @@ const canFsPip = !canDocPip && !canVideoPip && hasCapture && /Android/i.test(UA)
 const canPip = canDocPip || canVideoPip || canFsPip;
 $('#pipHint').textContent = !canPip ? 'Not supported in this browser'
   : canDocPip ? 'A small window with your timer and plan, always on top'
-  : canVideoPip ? 'A floating timer with play, skip and reset controls'
+  : canVideoPip ? 'A floating timer. Tap it to show play and skip'
   : 'Opens the timer full screen. Go Home and Android floats it';
 if (!canPip) { pipBtn.hidden = true; pipSetBtn.hidden = true; }
 const smooth = (a, b, k) => Math.abs(b - a) < 0.0015 ? b : a + (b - a) * k;
@@ -1677,189 +1835,48 @@ function closePip() {
 }
 function pipCleanup() {
   if (!pip.mode) return;
-  if (pip.mode === 'doc' && pip.win) { try { pip.win.cancelAnimationFrame(pip.rafId); } catch (e) {} }
+  if (pip.view) pip.view.destroy();
   if (pip.mode === 'video') clearMediaSession();
-  if (pip.fs) { try { screen.orientation && screen.orientation.unlock && screen.orientation.unlock(); } catch (e) {} }
   if (pip.toastView) { const i = toastViews.indexOf(pip.toastView); if (i > -1) toastViews.splice(i, 1); }
-  clearTimeout(pip.pendingT);
-  Object.assign(pip, { mode: null, fs: false, win: null, els: null, lastKey: '', locks: 0, taskSig: null, taskIds: [], pendingMode: null, toastView: null });
+  Object.assign(pip, { mode: null, fs: false, win: null, view: null, lastKey: '', toastView: null });
   updatePipButtons(); refreshTickRate();
 }
 
-/* ----- interactive window (desktop Chrome, Edge, Firefox) ----- */
-const SVG_PLUS_SM = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>';
-const PIP_HTML = `<div class="pip">
-  <div class="pip-top"><div class="seg pip-seg no-anim"><span class="seg-ind"></span><button data-mode="focus">Focus</button><button data-mode="break">Break</button><button data-mode="custom">Custom</button></div></div>
-  <div class="ring-wrap">
-    <svg class="ring" viewBox="0 0 360 360" aria-hidden="true">
-      <defs><linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" class="stop-a"/><stop offset="1" class="stop-b"/></linearGradient></defs>
-      <g class="ticks">${TICKS_HTML}</g>
-      <circle class="track" cx="180" cy="180" r="150"/>
-      <circle class="progress" cx="180" cy="180" r="150" transform="rotate(-90 180 180)"/>
-      <circle class="knob" cx="180" cy="30" r="8"/>
-    </svg>
-    <div class="ring-center"><div class="mode-label"></div><div class="time"></div><div class="status"></div></div>
-  </div>
-  <div class="controls">
-    <button class="ctrl ghost" data-act="reset" aria-label="Reset" title="Reset"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 12a8.5 8.5 0 1 0 2.6-6.1L3.5 8.5"/><path d="M3.5 3.5v5h5"/></svg></button>
-    <button class="ctrl primary" data-act="toggle" aria-label="Start"><svg class="i-play" viewBox="0 0 24 24"><path fill="currentColor" d="M7.5 5.2v13.6a1.2 1.2 0 0 0 1.82 1.03l11.05-6.8a1.2 1.2 0 0 0 0-2.06L9.32 4.17A1.2 1.2 0 0 0 7.5 5.2z"/></svg><svg class="i-pause" viewBox="0 0 24 24"><rect x="6" y="5" width="4.4" height="14" rx="1.5" fill="currentColor"/><rect x="13.6" y="5" width="4.4" height="14" rx="1.5" fill="currentColor"/></svg></button>
-    <button class="ctrl ghost" data-act="skip" aria-label="Skip" title="Skip"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M5 6.1v11.8a1.1 1.1 0 0 0 1.7.92l8.6-5.9a1.1 1.1 0 0 0 0-1.84L6.7 5.18A1.1 1.1 0 0 0 5 6.1z"/><rect x="17" y="5" width="2.4" height="14" rx="1.2" fill="currentColor"/></svg></button>
-  </div>
-  <section class="pip-tasks">
-    <div class="pip-tasks-head"><span>Plan</span><span class="pip-left"></span></div>
-    <ul class="pip-list"></ul>
-    <div class="pip-empty" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8.5 12.3l2.4 2.4 4.6-5.2"/></svg>All clear</div>
-    <form class="pip-add" autocomplete="off"><span class="add-icon">${SVG_PLUS_SM}</span><input type="text" placeholder="Add a task" maxlength="240" aria-label="New task"></form>
-  </section>
-  <div class="pip-foot">
-    <div class="pip-today"><span class="dot"></span><span><b class="pip-today-n">0</b> <span class="pip-today-w">blocks today</span></span></div>
-    <button class="pip-plus" data-act="log" title="Add one block to today">${SVG_PLUS_SM}Log block</button>
-  </div>
-</div>`;
-
+/* interactive window (desktop Chrome, Edge, Firefox) */
 async function openDocPip() {
-  const win = await window.documentPictureInPicture.requestWindow({ width: 360, height: 620 });
+  const win = await window.documentPictureInPicture.requestWindow({ width: 360, height: 580 });
   const d = win.document;
   d.documentElement.lang = 'en';
   ['#fontCss', '#appCss'].forEach(sel => { const s = $(sel); if (s) { const c = d.createElement('style'); c.textContent = s.textContent; d.head.appendChild(c); } });
   const meta = d.createElement('meta'); meta.name = 'color-scheme'; meta.content = 'dark light'; d.head.appendChild(meta);
   d.title = 'Chronos 2';
   d.body.className = 'pip-body ready';
-  d.body.innerHTML = PIP_HTML;
-  const els = {
-    root: d.documentElement, body: d.body, wrap: $('.ring-wrap', d), prog: $('.progress', d), knob: $('.knob', d),
-    time: $('.time', d), label: $('.mode-label', d), status: $('.status', d), seg: $('.pip-seg', d),
-    list: $('.pip-list', d), left: $('.pip-left', d), empty: $('.pip-empty', d), add: $('.pip-add', d), input: $('.pip-add input', d),
-    todayN: $('.pip-today-n', d), todayW: $('.pip-today-w', d), play: $('[data-act=toggle]', d), reset: $('[data-act=reset]', d)
-  };
-  els.prog.style.strokeDasharray = C;
-
+  d.body.dataset.mode = T.mode;
   const tv = d.createElement('div'); tv.className = 'toast'; tv.setAttribute('role', 'status');
-  tv.innerHTML = '<span></span><button hidden></button>'; d.body.appendChild(tv);
+  tv.innerHTML = '<span></span><button hidden></button>';
   pip.toastView = { el: tv, msg: tv.firstChild, btn: tv.lastChild };
   pip.toastView.btn.addEventListener('click', runToastAction);
+  pip.win = win; pip.mode = 'doc'; pip.fs = false;
+  const view = new MiniView(d, win, d.body);
+  pip.view = view;
+  d.body.appendChild(tv);
   toastViews.push(pip.toastView);
-
-  d.body.addEventListener('click', e => {
-    const modeBtn = e.target.closest('.pip-seg button[data-mode]');
-    if (modeBtn) { pipSetMode(modeBtn.dataset.mode); return; }
-    const check = e.target.closest('.pip-list .check');
-    if (check) { pipCheck(check.closest('.task')); return; }
-    const b = e.target.closest('[data-act]'); if (!b) return;
-    const a = b.dataset.act;
-    if (a === 'toggle') toggle(); else if (a === 'reset') reset(); else if (a === 'skip') skip(); else if (a === 'log') pipLogBlock(b);
-  });
-  els.add.addEventListener('submit', e => {
-    e.preventDefault();
-    const v = els.input.value.replace(/\s+/g, ' ').trim(); if (!v) return;
-    els.input.value = ''; addTask(v);
-    requestAnimationFrame(() => els.list.scrollTo({ top: els.list.scrollHeight, behavior: 'smooth' }));
-  });
   d.addEventListener('keydown', e => {
     if (e.target.closest && e.target.closest('input,textarea')) { if (e.key === 'Escape') e.target.blur(); return; }
     if (e.metaKey || e.ctrlKey || e.altKey) return;
     const k = e.key.toLowerCase();
     if (e.code === 'Space') { e.preventDefault(); toggle(); }
     else if (k === 'r') reset(); else if (k === 's') skip();
-    else if (k === 'n') { e.preventDefault(); els.input.focus(); }
-    else if (k === '1') pipSetMode('focus'); else if (k === '2') pipSetMode('break'); else if (k === '3') pipSetMode('custom');
+    else if (k === 'n') { e.preventDefault(); view.els.input.focus(); }
+    else if (k === '1') view.setMode('focus'); else if (k === '2') view.setMode('break'); else if (k === '3') view.setMode('custom');
   });
-  win.addEventListener('resize', () => positionInd(els.seg));
+  win.addEventListener('resize', () => positionInd(view.els.seg));
   win.addEventListener('pagehide', () => { if (pip.win === win) pipCleanup(); });
-
-  Object.assign(pip, { win, els, mode: 'doc', fs: false, p: targetProgress(), lastOff: -1, lastTxt: '', taskSig: null, taskIds: [] });
-  pipSync(); updatePipButtons(); refreshTickRate();
-  requestAnimationFrame(() => { positionInd(els.seg); win.requestAnimationFrame(() => els.seg.classList.remove('no-anim')); });
-  pipLoop();
-}
-function pipLoop() {
-  if (pip.mode !== 'doc' || !pip.win) return;
-  pip.p = smooth(pip.p, targetProgress(), .16);
-  const e = pip.els, off = C * (1 - pip.p);
-  if (Math.abs(off - pip.lastOff) > 0.05) {
-    pip.lastOff = off;
-    e.prog.style.strokeDashoffset = off;
-    const a = pip.p * Math.PI * 2;
-    e.knob.setAttribute('cx', (180 + 150 * Math.sin(a)).toFixed(2));
-    e.knob.setAttribute('cy', (180 - 150 * Math.cos(a)).toFixed(2));
-  }
-  const txt = fmt(remainingNow());
-  if (txt !== pip.lastTxt) { pip.lastTxt = txt; e.time.textContent = txt; e.time.classList.toggle('long', txt.length > 5); }
-  if (T.running && remainingNow() <= 0) complete();
-  pip.rafId = pip.win.requestAnimationFrame(pipLoop);
-}
-function pipSetMode(m) {
-  if (transitioning || !pip.els) return;
-  if (m === T.mode) { clearPending(); return; }
-  if (inProgress() && pip.pendingMode !== m) {
-    pip.pendingMode = m; haptic(6); uiSound('tap');
-    clearTimeout(pip.pendingT); pip.pendingT = setTimeout(() => { clearPending(); pipSync(); }, 2600);
-    pipSync(); return;
-  }
-  clearPending(); haptic(6); uiSound('tap');
-  setMode(m, { force: true });
-}
-function clearPending() { pip.pendingMode = null; clearTimeout(pip.pendingT); }
-function pipCheck(li) {
-  if (!li || li.classList.contains('done') || li.classList.contains('leaving')) return;
-  const id = li.dataset.id, mainLi = $(`.task[data-id="${CSS.escape(id)}"]`, taskList);
-  if (!mainLi) return;
-  pip.locks++;
-  li.classList.add('done');
-  const r = $('.check', li).getBoundingClientRect();
-  burst(pip.win.document, r.left + r.width / 2, r.top + r.height / 2);
-  completeTask(mainLi, { silentBurst: true });
-  setTimeout(() => collapse(li, () => { pip.locks = Math.max(0, pip.locks - 1); pipRenderTasks(); }), 620);
-}
-function pipLogBlock(btn) {
-  const k = todayKey(), prev = days.get(k) || 0;
-  incrementDay(k, 1); haptic(10); uiSound('check');
-  if (btn && pip.win) { const r = btn.getBoundingClientRect(); burst(pip.win.document, r.left + 18, r.top + r.height / 2); }
-  toast('Logged 1 block for today', { action: 'Undo', onAction: () => setDay(k, prev) });
-}
-function pipRenderTasks() {
-  const e = pip.els; if (!e || pip.locks) return;
-  const sig = tasks.map(t => t.id + '\u0001' + t.text).join('\u0002');
-  if (sig === pip.taskSig) return;
-  const first = pip.taskSig === null, prev = new Set(pip.taskIds), top = e.list.scrollTop;
-  e.list.innerHTML = '';
-  tasks.forEach(t => {
-    const li = taskEl(t);
-    $('.task-body', li).title = t.text;
-    if (!first && !prev.has(t.id)) li.classList.add('enter');
-    e.list.appendChild(li);
-  });
-  e.list.scrollTop = top;
-  pip.taskSig = sig; pip.taskIds = tasks.map(t => t.id);
-  const n = tasks.length;
-  e.left.textContent = n ? `${n} left` : '';
-  e.empty.hidden = n > 0;
-}
-function pipSync() {
-  if (!pip.mode) return;
-  if (pip.mode === 'doc' && pip.els) {
-    const e = pip.els;
-    e.root.dataset.theme = root.dataset.theme;
-    e.root.style.cssText = root.style.cssText;
-    e.body.dataset.mode = T.mode;
-    e.body.classList.toggle('is-running', T.running);
-    e.label.textContent = LABELS[T.mode];
-    e.status.textContent = pip.pendingMode ? 'Tap again to switch' : lastStatus;
-    e.play.setAttribute('aria-label', T.running ? 'Pause' : 'Start');
-    e.reset.disabled = resetBtn.disabled;
-    $$('button[data-mode]', e.seg).forEach(b => { b.classList.toggle('on', b.dataset.mode === T.mode); b.classList.toggle('pending', b.dataset.mode === pip.pendingMode); });
-    positionInd(e.seg);
-    const n = days.get(todayKey()) || 0;
-    if (e.todayN.textContent !== String(n)) { e.todayN.textContent = n; restartClass(e.todayN, 'bump'); }
-    e.todayW.textContent = n === 1 ? 'block today' : 'blocks today';
-    pipRenderTasks();
-  } else if (pip.mode === 'video') {
-    pipReadColors(); updateMediaSession(); drawPipCanvas(true);
-  }
+  updatePipButtons(); refreshTickRate();
 }
 
-/* ----- floating video (iPad, Safari, Android) ----- */
-const VW = 960, VH = 540;
+/* floating video (iPad, Safari, Android): square so no window shape can squeeze it */
+const VS = 720;
 function pipReadColors() {
   const cs = getComputedStyle(document.body), g = n => cs.getPropertyValue(n).trim();
   pip.colors = { bg: g('--bg'), surface: g('--surface'), line: g('--line-2'), track: g('--surface-3'), mode: g('--mode'), mode2: g('--mode-2'),
@@ -1868,14 +1885,14 @@ function pipReadColors() {
 }
 function ensureVideo() {
   if (pip.video) return pip.video;
-  const c = document.createElement('canvas'); c.width = VW; c.height = VH;
+  const c = document.createElement('canvas'); c.width = c.height = VS;
   pip.canvas = c; pip.ctx = c.getContext('2d');
   pipReadColors(); drawPipCanvas(true);
   let stream = c.captureStream(0), track = stream.getVideoTracks()[0];
   if (!track || typeof track.requestFrame !== 'function') { stream.getTracks().forEach(t => t.stop()); stream = c.captureStream(12); track = null; }
   pip.track = track;
   const v = document.createElement('video');
-  v.muted = true; v.playsInline = true; v.autoplay = true;
+  v.muted = true; v.playsInline = true; v.autoplay = true; v.width = VS; v.height = VS;
   v.setAttribute('muted', ''); v.setAttribute('playsinline', ''); v.className = 'pip-video'; v.setAttribute('aria-hidden', 'true');
   v.srcObject = stream;
   document.body.appendChild(v);
@@ -1909,7 +1926,6 @@ async function openFsPip() {
   drawPipCanvas(true);
   try { await v.requestFullscreen({ navigationUI: 'hide' }); }
   catch (e) { pip.mode = null; pip.fs = false; throw e; }
-  try { if (screen.orientation && screen.orientation.lock) screen.orientation.lock('landscape').catch(() => {}); } catch (e) {}
   setupMediaSession(); updatePipButtons(); refreshTickRate(); pipSync();
 }
 function pipUserToggle() {
@@ -1935,7 +1951,7 @@ function updateMediaSession() {
   const ms = navigator.mediaSession;
   try { ms.playbackState = T.running ? 'playing' : 'paused'; } catch (e) {}
   const n = tasks.length;
-  const artist = n ? `${n} task${n === 1 ? '' : 's'} left · next: ${tasks[0].text}` : 'All clear';
+  const artist = n ? `Next: ${tasks[0].text}` : 'All clear';
   const key = T.mode + artist + iconPng.length;
   if (key === pip.metaKey || !window.MediaMetadata) return;
   pip.metaKey = key;
@@ -1953,25 +1969,15 @@ function drawMono(x, s, cx, cy) {
   let left = cx - widths.reduce((a, b) => a + b, 0) / 2;
   [...s].forEach((ch, i) => { x.fillText(ch, left + widths[i] / 2, cy); left += widths[i]; });
 }
-function drawSpaced(x, s, left, cy, sp, center) {
+function drawSpaced(x, s, cx, cy, sp) {
   const chars = [...s], ws = chars.map(ch => x.measureText(ch).width);
-  if (center) left -= (ws.reduce((a, b) => a + b, 0) + sp * (chars.length - 1)) / 2;
+  let left = cx - (ws.reduce((a, b) => a + b, 0) + sp * (chars.length - 1)) / 2;
   chars.forEach((ch, i) => { x.fillText(ch, left + ws[i] / 2, cy); left += ws[i] + sp; });
 }
-function wrapLines(x, text, maxW, maxLines) {
-  const lines = [];
-  let cur = '';
-  text.split(/\s+/).forEach(w => {
-    const t = cur ? cur + ' ' + w : w;
-    if (!cur || x.measureText(t).width <= maxW) cur = t; else { lines.push(cur); cur = w; }
-  });
-  if (cur) lines.push(cur);
-  const out = lines.slice(0, maxLines), cut = lines.length > maxLines;
-  return out.map((l, i) => {
-    if (!((i === out.length - 1 && cut) || x.measureText(l).width > maxW)) return l;
-    while (l.length && x.measureText(l + '…').width > maxW) l = l.slice(0, -1);
-    return l.trimEnd() + '…';
-  });
+function ellipsize(x, s, maxW) {
+  if (x.measureText(s).width <= maxW) return s;
+  while (s.length && x.measureText(s + '…').width > maxW) s = s.slice(0, -1);
+  return s.trimEnd() + '…';
 }
 function rrect(x, X, Y, w, h, r) {
   x.beginPath();
@@ -1981,20 +1987,19 @@ function rrect(x, X, Y, w, h, r) {
 function drawPipCanvas(force) {
   const c = pip.canvas; if (!c || !pip.colors) return;
   pip.p = smooth(pip.p, targetProgress(), .35);
-  const txt = fmt(remainingNow()), st = lastStatus, n = tasks.length, next = n ? tasks[0].text : '', today = days.get(todayKey()) || 0;
+  const txt = fmt(remainingNow()), st = lastStatus, n = tasks.length, next = n ? tasks[0].text : '';
   const hint = pip.fs && Date.now() < pip.hintUntil && !document.pictureInPictureElement;
-  const key = [pip.p.toFixed(4), txt, st, T.mode, T.running, pip.colorsKey, n, next, today, hint].join('|');
+  const key = [pip.p.toFixed(4), txt, st, T.mode, T.running, pip.colorsKey, n, next, hint].join('|');
   if (!force && key === pip.lastKey) return;
   pip.lastKey = key;
   const x = pip.ctx, k = pip.colors, F = 'Inter, system-ui, sans-serif';
-  x.clearRect(0, 0, VW, VH);
-  x.fillStyle = k.bg; x.fillRect(0, 0, VW, VH);
-  const cx = 270, cy = 270, r = 192, lw = 20;
-  const g = x.createRadialGradient(cx, cy, 0, cx, cy, 330);
+  x.clearRect(0, 0, VS, VS);
+  x.fillStyle = k.bg; x.fillRect(0, 0, VS, VS);
+  const cx = 360, cy = 296, r = 214, lw = 22;
+  const g = x.createRadialGradient(cx, cy, 0, cx, cy, 340);
   g.addColorStop(0, `rgba(${k.modeRgb},${T.running ? .2 : .09})`); g.addColorStop(1, `rgba(${k.modeRgb},0)`);
-  x.fillStyle = g; x.fillRect(0, 0, VW, VH);
+  x.fillStyle = g; x.fillRect(0, 0, VS, VS);
 
-  // ring
   x.lineWidth = lw; x.strokeStyle = k.track; x.beginPath(); x.arc(cx, cy, r, 0, Math.PI * 2); x.stroke();
   const p = pip.p;
   if (p > 0.0005) {
@@ -2003,45 +2008,45 @@ function drawPipCanvas(force) {
     x.strokeStyle = lg; x.lineCap = 'round'; x.beginPath(); x.arc(cx, cy, r, -Math.PI / 2, -Math.PI / 2 + p * Math.PI * 2); x.stroke();
   }
   const a = p * Math.PI * 2;
-  x.fillStyle = '#fff'; x.beginPath(); x.arc(cx + r * Math.sin(a), cy - r * Math.cos(a), 11, 0, Math.PI * 2); x.fill();
+  x.fillStyle = '#fff'; x.beginPath(); x.arc(cx + r * Math.sin(a), cy - r * Math.cos(a), 12, 0, Math.PI * 2); x.fill();
   x.textAlign = 'center'; x.textBaseline = 'middle';
-  x.fillStyle = k.mode; x.font = `600 24px ${F}`;
-  drawSpaced(x, LABELS[T.mode].toUpperCase(), cx, cy - 76, 5, true);
-  x.fillStyle = k.text; x.font = `300 ${txt.length > 5 ? 90 : 112}px ${F}`;
+  x.fillStyle = k.mode; x.font = `600 26px ${F}`;
+  drawSpaced(x, LABELS[T.mode].toUpperCase(), cx, cy - 84, 6);
+  x.fillStyle = k.text; x.font = `300 ${txt.length > 5 ? 100 : 128}px ${F}`;
   drawMono(x, txt, cx, cy + 4);
-  x.fillStyle = k.text2; x.font = `400 24px ${F}`;
-  x.fillText(st, cx, cy + 78);
+  x.fillStyle = k.text2; x.font = `400 27px ${F}`;
+  x.fillText(st, cx, cy + 86);
 
-  // plan card
-  const X = 516, Y = 62, CW = 400, CH = 416, P = 34, inner = CW - P * 2;
-  rrect(x, X, Y, CW, CH, 30); x.fillStyle = k.surface; x.fill();
+  // up-next bar
+  const X = 44, Y = 572, W = VS - 88, H = 104;
+  rrect(x, X, Y, W, H, 30); x.fillStyle = k.surface; x.fill();
   x.lineWidth = 1.5; x.strokeStyle = k.line; x.stroke();
+  const my = Y + H / 2;
   x.textAlign = 'left';
-  x.fillStyle = k.text3; x.font = `600 19px ${F}`;
-  x.textAlign = 'center'; drawSpaced(x, n ? 'UP NEXT' : 'PLAN', X + P, Y + 52, 3.5, false); x.textAlign = 'left';
   if (n) {
-    x.fillStyle = k.text; x.font = `500 34px ${F}`;
-    wrapLines(x, next, inner, 2).forEach((l, i) => x.fillText(l, X + P, Y + 104 + i * 44));
+    x.lineWidth = 3; x.strokeStyle = k.text3; x.beginPath(); x.arc(X + 50, my, 15, 0, Math.PI * 2); x.stroke();
+    x.font = `500 25px ${F}`;
+    const leftTxt = `${n} left`, lw2 = x.measureText(leftTxt).width;
+    x.fillStyle = k.text2; x.textAlign = 'right'; x.fillText(leftTxt, X + W - 32, my);
+    x.textAlign = 'left'; x.fillStyle = k.text; x.font = `500 31px ${F}`;
+    x.fillText(ellipsize(x, next, W - 84 - lw2 - 64), X + 84, my);
   } else {
-    x.fillStyle = k.text; x.font = `500 34px ${F}`; x.fillText('All clear', X + P, Y + 104);
-    x.fillStyle = k.text2; x.font = `400 22px ${F}`; x.fillText('Nothing left in your plan', X + P, Y + 146);
+    x.fillStyle = '#22C55E'; x.beginPath(); x.arc(X + 50, my, 16, 0, Math.PI * 2); x.fill();
+    x.strokeStyle = '#06210F'; x.lineWidth = 3.5; x.lineCap = 'round'; x.lineJoin = 'round';
+    x.beginPath(); x.moveTo(X + 42, my + 1); x.lineTo(X + 48, my + 7); x.lineTo(X + 58, my - 6); x.stroke();
+    x.fillStyle = k.text; x.font = `500 31px ${F}`; x.fillText('All clear', X + 84, my);
   }
-  x.fillStyle = k.line; x.fillRect(X + P, Y + 228, inner, 1.5);
-  const col2 = X + P + inner / 2;
-  x.fillStyle = k.text; x.font = `600 56px ${F}`;
-  x.fillText(String(n), X + P, Y + 298); x.fillText(String(today), col2, Y + 298);
-  x.fillStyle = k.text2; x.font = `400 22px ${F}`;
-  x.fillText(n === 1 ? 'task left' : 'tasks left', X + P, Y + 350);
-  x.fillText(today === 1 ? 'block today' : 'blocks today', col2, Y + 350);
-
   if (hint) {
     const msg = 'Swipe Home to float this timer';
-    x.font = `500 22px ${F}`; const w = x.measureText(msg).width + 48;
-    const hx = X + CW / 2;
-    rrect(x, hx - w / 2, VH - 52, w, 40, 20); x.fillStyle = k.toastBg; x.fill();
-    x.fillStyle = k.toastFg; x.textAlign = 'center'; x.fillText(msg, hx, VH - 32);
+    x.font = `500 24px ${F}`; const w = x.measureText(msg).width + 48;
+    rrect(x, VS / 2 - w / 2, 18, w, 44, 22); x.fillStyle = k.toastBg; x.fill();
+    x.fillStyle = k.toastFg; x.textAlign = 'center'; x.fillText(msg, VS / 2, 40);
   }
   if (pip.track) { try { pip.track.requestFrame(); } catch (e) {} }
+}
+function pipSync() {
+  eachView(v => v.sync());
+  if (pip.mode === 'video') { pipReadColors(); updateMediaSession(); drawPipCanvas(true); }
 }
 pipBtn.addEventListener('click', togglePip);
 pipSetBtn.addEventListener('click', () => { closeSettings(); setTimeout(togglePip, 0); });
@@ -2223,7 +2228,7 @@ document.addEventListener('keydown', e => {
   else if (k === 'r') reset();
   else if (k === 's') skip();
   else if (k === 'p') togglePip();
-  else if (k === 'n') { e.preventDefault(); addInput.focus(); }
+  else if (k === 'n') { e.preventDefault(); (mainMini ? mainMini.els.input : addInput).focus(); }
   else if (k === ',') openSettings();
   else if (k === '1') setMode('focus');
   else if (k === '2') setMode('break');
@@ -2281,7 +2286,7 @@ async function init() {
     navigator.storage.persist().then(p => { info.textContent = p ? 'IndexedDB · persistent on this device' : 'IndexedDB on this device'; }).catch(() => {});
   }
   if (!persistent) setTimeout(() => toast('Storage unavailable · changes won’t be saved'), 900);
-  updateInstallUI(); updateOfflineUI(); updatePipButtons(); refreshTickRate();
+  updateInstallUI(); updateOfflineUI(); updatePipButtons(); refreshTickRate(); applyMini();
 
   document.body.classList.add('ready');
   const settle = () => { positionAllInds(); requestAnimationFrame(() => $$('.seg.no-anim').forEach(s => s.classList.remove('no-anim'))); };
