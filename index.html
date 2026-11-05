@@ -145,9 +145,10 @@ body.is-running[data-mode=focus] .g-focus,body.is-running[data-mode=break] .g-br
   line-height:1.08;padding:0 .14em;border-radius:20px;transition:transform .45s var(--spring),background-color .25s}
 .time.long{font-size:58px;font-size:16cqi}
 .time .dg{display:inline-block}
-.time .dg.roll{animation:roll .42s var(--ease)}
+.time .dg.roll{animation:roll .32s var(--ease)}
 .time .dc{display:inline-block;transform:translateY(-.07em);opacity:.55;margin:0 .01em}
-.is-paused .time{animation:pausedPulse 2.8s ease-in-out infinite}
+.time{transition:transform .45s var(--spring),background-color .25s,opacity .45s var(--ease)}
+.is-paused .time{opacity:.5}
 button.time:not(:disabled):active{transform:scale(.96)}
 @media (hover:hover){button.time:not(:disabled):hover{background:var(--surface-2)}}
 .status{font-size:14px;color:var(--text-2);height:20px;font-variant-numeric:tabular-nums;white-space:nowrap}
@@ -601,7 +602,7 @@ html[data-theme=light] .splash::before{display:none}
 body:not(.ready) .reveal{opacity:0}
 body.ready .reveal{animation:rise .9s var(--ease) both;animation-delay:calc(var(--d,0) * 90ms)}
 
-@keyframes roll{from{opacity:0;transform:translateY(-.2em);filter:blur(3px)}to{opacity:1;transform:none;filter:blur(0)}}
+@keyframes roll{from{opacity:.25;transform:translateY(-.1em)}to{opacity:1;transform:none}}
 @keyframes pausedPulse{0%,100%{opacity:1}50%{opacity:.42}}
 @keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
@@ -643,7 +644,9 @@ body.ready .reveal{animation:rise .9s var(--ease) both;animation-delay:calc(var(
 }
 /* ===== phone app ===== */
 .next-up,.tabbar,.sheet-grab,.sl-short{display:none}
-body.mobile{--tabbar-h:64px;--tabbar-gap:12px;--tabbar-space:calc(var(--tabbar-h) + var(--tabbar-gap) + env(safe-area-inset-bottom));overflow:hidden;overscroll-behavior:none}
+html:has(body.mobile){overflow:hidden;overscroll-behavior:none}
+body.mobile .seg-modes{overflow:hidden}
+body.mobile{max-width:100vw;--tabbar-h:64px;--tabbar-gap:12px;--tabbar-space:calc(var(--tabbar-h) + var(--tabbar-gap) + env(safe-area-inset-bottom));overflow:hidden;overscroll-behavior:none}
 body.mobile .screen{height:var(--app-h,100svh);min-height:0;grid-template-rows:auto minmax(0,1fr);gap:2px;
   padding:max(8px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) calc(var(--tabbar-space) + 10px) max(16px,env(safe-area-inset-left))}
 body.mobile .topbar{height:44px}
@@ -727,11 +730,9 @@ body.mobile .day{border-radius:12px}
 /* floating tab bar */
 body.mobile .tabbar{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));position:fixed;z-index:20;
   left:max(14px,env(safe-area-inset-left));right:max(14px,env(safe-area-inset-right));bottom:calc(var(--tabbar-gap) + env(safe-area-inset-bottom));
-  height:var(--tabbar-h);padding:6px;border-radius:24px;background:var(--surface);
+  height:var(--tabbar-h);padding:6px;border-radius:24px;background:var(--surface);overflow:hidden;contain:layout paint;
   border:1px solid var(--line);box-shadow:0 20px 44px -20px rgba(10,16,30,.42),0 2px 8px -4px rgba(10,16,30,.12)}
-@supports ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))) and (background:color-mix(in srgb,red 50%,blue)){
-  body.mobile .tabbar{background:color-mix(in srgb,var(--surface) 80%,transparent);-webkit-backdrop-filter:blur(22px) saturate(170%);backdrop-filter:blur(22px) saturate(170%)}
-}
+.tabbar.no-anim .seg-ind{transition:none}
 .tabbar .seg-ind{top:6px;bottom:6px;border-radius:18px;background:rgba(var(--accent-rgb),.13);box-shadow:none!important}
 .tabbar button{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border-radius:18px;
   font-size:11.5px;font-weight:600;color:var(--text-3);transition:color .3s var(--ease)}
@@ -745,7 +746,24 @@ body.mobile .tabbar{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));p
 .tb-label.live{color:var(--mode)}
 .tb-badge{position:absolute;top:-6px;right:-12px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--accent);color:var(--on-accent);
   font-size:11px;font-weight:700;line-height:18px;text-align:center;box-shadow:0 0 0 2px var(--surface)}
-html.kb-open .tabbar{display:none!important}
+html.kb-open .tabbar,html.typing .tabbar{display:none!important}
+html.typing body.mobile .screen{padding-bottom:8px}
+html.typing body.mobile[data-view=plan] .tasks-card .card-head{padding-top:4px;padding-bottom:6px}
+html.typing body.mobile .topbar{display:none}
+html.typing body.mobile .screen{grid-template-rows:minmax(0,1fr)}
+html.typing body.mobile .toast{bottom:12px}
+/* no blur on phones: plain dim backdrops keep sheet animations smooth */
+body.mobile .set-backdrop,body.mobile .dlg-backdrop{-webkit-backdrop-filter:none;backdrop-filter:none;background:rgba(8,12,24,.38)}
+html[data-theme=dark] body.mobile .set-backdrop,html[data-theme=dark] body.mobile .dlg-backdrop{background:rgba(0,0,0,.55)}
+body.mobile .settings.open .group{animation:none}
+body.mobile .progress{filter:none}
+body.mobile .ring-wrap::before{inset:10%}
+body.mobile{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+body.mobile input,body.mobile textarea,body.mobile .task-edit{-webkit-user-select:text;user-select:text;-webkit-touch-callout:default}
+body.mobile .task:active:not(.swiping){background:var(--surface-2)}
+body.mobile .next-up:active{transform:scale(.985)}
+body.mobile .next-up{transition:transform .35s var(--spring)}
+body.mobile .stat,body.mobile .stats{transition:none}
 body.mobile .toast{bottom:calc(var(--tabbar-space) + 12px)}
 
 /* bottom sheets: settings and pop-ups slide up; drag the top down to close */
@@ -1279,7 +1297,9 @@ function holdRepeat(btn, fn) {
 function positionInd(seg) {
   const ind = $('.seg-ind', seg), on = $('button.on', seg);
   if (!ind) return;
+  if (!seg.getClientRects().length) return;
   if (!on || !on.offsetWidth) { ind.style.opacity = 0; return; }
+  if (ind.style.opacity !== '1') { seg.classList.add('no-anim'); requestAnimationFrame(() => requestAnimationFrame(() => seg.classList.remove('no-anim'))); }
   ind.style.width = on.offsetWidth + 'px';
   ind.style.transform = `translateX(${on.offsetLeft}px)`;
   ind.style.opacity = 1;
@@ -1458,7 +1478,7 @@ function updateUI() {
 }
 function swapIn(els) {
   els.forEach(el => el && el.animate && el.animate(
-    [{ opacity: 0, transform: 'translateY(6px)', filter: 'blur(6px)' }, { opacity: 1, transform: 'none', filter: 'blur(0)' }],
+    [{ opacity: 0, transform: 'translateY(6px) scale(.985)' }, { opacity: 1, transform: 'none' }],
     { duration: 480, easing: EASE }));
 }
 let saveTimerT = 0;
@@ -1623,7 +1643,7 @@ function onViewport() {
   if (!editing) stableH = innerHeight;
   const open = editing && stableH - vh > 110;
   const bs = document.body.style;
-  bs.setProperty('--vv-h', Math.round(vh) + 'px'); bs.setProperty('--kb-inset', Math.max(0, Math.round(innerHeight - (top + vh))) + 'px'); bs.setProperty('--vv-top', Math.round(top) + 'px'); bs.setProperty('--app-h', Math.round(stableH) + 'px');
+  bs.setProperty('--vv-h', Math.round(vh) + 'px'); bs.setProperty('--kb-inset', Math.max(0, Math.round(innerHeight - (top + vh))) + 'px'); bs.setProperty('--vv-top', Math.round(top) + 'px'); bs.setProperty('--app-h', Math.round(open && document.body.classList.contains('mobile') && ae && tasksCard.contains(ae) ? vh + top : stableH) + 'px');
   if (open !== kbOpen) { kbOpen = open; root.classList.toggle('kb-open', open); }
   updateEditSheet();
   if (open && ae) keepVisible(ae);
@@ -1644,7 +1664,7 @@ function keepVisible(el) {
 const tasksCard = document.querySelector('.tasks-card');
 function updateEditSheet() {
   const ae = document.activeElement;
-  const on = kbOpen && !document.body.classList.contains('mini') && !!ae && tasksCard.contains(ae) && isField(ae);
+  const on = kbOpen && !document.body.classList.contains('mini') && !document.body.classList.contains('mobile') && !!ae && tasksCard.contains(ae) && isField(ae);
   if (on === document.body.classList.contains('edit-sheet')) return;
   document.body.classList.toggle('edit-sheet', on);
   if (on) requestAnimationFrame(() => { positionInd(panelTabs); if (ae.tagName !== 'TEXTAREA') ae.scrollIntoView({ block: 'nearest' }); });
@@ -1652,7 +1672,11 @@ function updateEditSheet() {
 }
 if (VV) { VV.addEventListener('resize', queueViewport); VV.addEventListener('scroll', queueViewport); }
 window.addEventListener('resize', queueViewport);
-const syncMiniEditing = () => { const ae = document.activeElement; root.classList.toggle('mini-editing', matchMedia('(pointer: coarse)').matches && isField(ae) && !!ae.closest('.mini-host')); };
+const syncMiniEditing = () => {
+  const ae = document.activeElement, coarse = matchMedia('(pointer: coarse)').matches, field = isField(ae);
+  root.classList.toggle('mini-editing', coarse && field && !!ae.closest('.mini-host'));
+  root.classList.toggle('typing', coarse && field && document.body.classList.contains('mobile'));
+};
 document.addEventListener('focusin', () => { syncMiniEditing(); queueViewport(); setTimeout(queueViewport, 300); setTimeout(queueViewport, 650); });
 document.addEventListener('focusout', () => { setTimeout(syncMiniEditing, 0); setTimeout(queueViewport, 60); setTimeout(queueViewport, 400); });
 document.getElementById('sheetDone').addEventListener('click', () => { const ae = document.activeElement; ae && ae.blur && ae.blur(); });
@@ -2096,6 +2120,7 @@ $('#todayPill').addEventListener('click', () => { haptic(6); openDayEditor(today
 let observer = null;
 if ('IntersectionObserver' in window) {
   observer = new IntersectionObserver(entries => entries.forEach(en => { if (en.isIntersecting) { en.target.classList.add('in'); observer.unobserve(en.target); } }), { threshold: .06 });
+  $$('.rv').forEach(el => el.addEventListener('animationend', () => el.classList.remove('rv', 'in'), { once: true }));
   $$('.rv').forEach(el => observer.observe(el));
 } else $$('.rv').forEach(el => el.classList.add('in'));
 
@@ -2278,6 +2303,13 @@ function applyMini() {
   }
 }
 
+/* one-shot effects are cleared when they finish, so showing a section again never replays them */
+document.addEventListener('animationend', e => {
+  const c = e.target && e.target.classList; if (!c) return;
+  ['enter', 'swap', 'pop', 'bump', 'roll', 'view-in'].forEach(k => c.remove(k));
+  if (c.contains('panel')) c.remove('in');
+}, true);
+
 /* ---------- Bottom sheets: drag down to close ---------- */
 function sheetDrag(sheet, canStart, onClose) {
   let st = null;
@@ -2325,9 +2357,15 @@ function setView(v, { animate = true } = {}) {
   $$('button[data-view]', tabbar).forEach(b => { const on = b.dataset.view === v; b.classList.toggle('on', on); b.setAttribute('aria-selected', on); });
   const el = v === 'timer' ? $('.timer-card') : v === 'plan' ? tasksCard : $('#calendar');
   const ORDER = { timer: 0, plan: 1, activity: 2 };
-  if (animate && changed) { el.classList.remove('view-r', 'view-l'); reflow(el); el.classList.add(ORDER[v] > ORDER[prevView] ? 'view-r' : 'view-l'); }
+  [$('.timer-card'), tasksCard, $('#calendar')].forEach(x => { if (x !== el) x.classList.remove('view-r', 'view-l'); });
+  if (animate && changed) {
+    el.classList.remove('view-r', 'view-l'); reflow(el); el.classList.add(ORDER[v] > ORDER[prevView] ? 'view-r' : 'view-l');
+    el.addEventListener('animationend', function done(ev) { if (ev.target === el) { el.classList.remove('view-r', 'view-l'); el.removeEventListener('animationend', done); } });
+  }
+  $$('.seg, .panel-tabs', el).forEach(x => x.classList.add('no-anim'));
+  requestAnimationFrame(() => { $$('.seg, .panel-tabs', el).forEach(positionInd); requestAnimationFrame(() => $$('.seg, .panel-tabs', el).forEach(x => x.classList.remove('no-anim'))); });
   prevView = v;
-  if (v === 'activity') $$('.calendar .rv').forEach(x => x.classList.add('in'));
+  if (v === 'activity') $$('.calendar .rv').forEach(x => x.classList.remove('rv', 'in'));
   if (settings.mview !== v) { settings.mview = v; saveSettings(); }
   requestAnimationFrame(positionAllInds);
   updateTabTimer();
@@ -2352,7 +2390,11 @@ function renderNextUp() {
   if (nextLock) return;
   const t = tasks[0];
   nextUp.hidden = !t;
-  if (t && nextUp.dataset.id !== t.id) { nextUp.dataset.id = t.id; nextTask.textContent = t.text; nextUp.classList.remove('done'); if (!document.hidden) restartClass(nextUp, 'view-in'); }
+  if (t && nextUp.dataset.id !== t.id) {
+    const first = !nextUp.dataset.id;
+    nextUp.dataset.id = t.id; nextTask.textContent = t.text; nextUp.classList.remove('done');
+    if (!first && !document.hidden && nextUp.animate) nextUp.animate([{ opacity: 0, transform: 'translateY(6px)' }, { opacity: 1, transform: 'none' }], { duration: 380, easing: EASE });
+  }
   else if (t) nextTask.textContent = t.text;
 }
 $('#nextCheck').addEventListener('click', () => {
@@ -2894,6 +2936,7 @@ function reveal() {
   positionAllInds();
   document.body.classList.add('ready');
   if (sp) { sp.classList.add('out'); setTimeout(() => sp.remove(), 800); }
+  setTimeout(() => $$('.reveal').forEach(el => el.classList.remove('reveal')), 1500);
   requestAnimationFrame(() => { positionAllInds(); requestAnimationFrame(() => $$('.seg.no-anim, .panel-tabs.no-anim').forEach(s => s.classList.remove('no-anim'))); });
 }
 setTimeout(() => { revealed || (LAUNCH_MS > 0 && reveal()); }, 5000);
