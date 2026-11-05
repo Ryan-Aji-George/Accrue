@@ -641,75 +641,144 @@ body.ready .reveal{animation:rise .9s var(--ease) both;animation-delay:calc(var(
   .cal-title h3{font-size:18px}
   .cal-total{display:none}
 }
-/* ===== phone app layout: one section at a time + bottom tab bar ===== */
-.next-up,.tabbar{display:none}
-body.mobile{--tabbar-h:66px;overflow:hidden;overscroll-behavior:none}
-body.mobile .screen{height:var(--app-h,100svh);min-height:0;grid-template-rows:auto minmax(0,1fr);gap:6px;
-  padding:max(10px,env(safe-area-inset-top)) max(14px,env(safe-area-inset-right)) calc(var(--tabbar-h) + env(safe-area-inset-bottom) + 6px) max(14px,env(safe-area-inset-left))}
-body.mobile .topbar{height:48px}
-body.mobile .logo{width:32px;height:32px;border-radius:9px}
-body.mobile .brand-name{font-size:17px}
+/* ===== phone app ===== */
+.next-up,.tabbar,.sheet-grab,.sl-short{display:none}
+body.mobile{--tabbar-h:64px;--tabbar-gap:12px;--tabbar-space:calc(var(--tabbar-h) + var(--tabbar-gap) + env(safe-area-inset-bottom));overflow:hidden;overscroll-behavior:none}
+body.mobile .screen{height:var(--app-h,100svh);min-height:0;grid-template-rows:auto minmax(0,1fr);gap:2px;
+  padding:max(8px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) calc(var(--tabbar-space) + 10px) max(16px,env(safe-area-inset-left))}
+body.mobile .topbar{height:44px}
+body.mobile .brand{gap:10px}
+body.mobile .logo{width:28px;height:28px;border-radius:8px;box-shadow:none}
+body.mobile .brand-name{font-size:16px}
 body.mobile .date{display:none}
-body.mobile .icon-btn{width:42px;height:42px;border-radius:14px}
+body.mobile .top-right{gap:2px}
+body.mobile .topbar .icon-btn{width:42px;height:42px;border-radius:50%;background:transparent;border-color:transparent;box-shadow:none;color:var(--text-2)}
+body.mobile .topbar .icon-btn:active{background:var(--surface-3)}
+body.mobile .topbar .icon-btn.on{background:rgba(var(--accent-rgb),.13);color:var(--accent)}
 body.mobile .scroll-hint{display:none}
 body.mobile .workspace{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr);gap:0}
 body.mobile .timer-card,body.mobile .tasks-card,body.mobile .calendar{display:none}
-body.mobile[data-view=timer] .timer-card{display:flex;justify-content:space-evenly;padding:6px 0 4px;gap:14px}
-body.mobile[data-view=plan] .tasks-card{display:flex;min-height:0;padding:16px 12px 12px;border-radius:24px}
-body.mobile[data-view=activity] .calendar{display:flex;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:4px 2px 10px;gap:12px;-webkit-overflow-scrolling:touch}
+body.mobile .view-r{animation:viewR .42s var(--ease) both}
+body.mobile .view-l{animation:viewL .42s var(--ease) both}
 body.mobile .view-in{animation:viewIn .4s var(--ease) both}
-@keyframes viewIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
-body.mobile .ring-wrap{width:clamp(200px,min(84vw,calc(var(--app-h,100svh) - 380px)),440px)}
-body.mobile .timer-main{gap:clamp(14px,3vh,28px)}
-body.mobile .ctrl.primary{width:80px;height:80px}
-body.mobile .ctrl.ghost{width:54px;height:54px}
-body.mobile .seg-modes button{height:38px;padding:0 18px}
+@keyframes viewR{from{opacity:0;transform:translateX(26px)}to{opacity:1;transform:none}}
+@keyframes viewL{from{opacity:0;transform:translateX(-26px)}to{opacity:1;transform:none}}
+@keyframes viewIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* timer */
+body.mobile[data-view=timer] .timer-card{display:flex;justify-content:space-between;padding:12px 0 4px;gap:10px}
+body.mobile .seg-modes{width:min(100%,340px)}
+body.mobile .seg-modes button{flex:1;height:38px;padding:0 10px;font-size:14.5px}
+body.mobile .timer-main{gap:clamp(18px,3.4vh,34px)}
+body.mobile .ring-wrap{width:clamp(210px,min(86vw,calc(var(--app-h,100svh) - 380px)),440px)}
+body.mobile .time{font-size:21.5cqi}
+body.mobile .controls{gap:28px}
+body.mobile .ctrl.primary{width:84px;height:84px}
+body.mobile .ctrl.primary svg{width:30px;height:30px}
+body.mobile .ctrl.ghost{width:56px;height:56px;background:var(--surface);border-color:var(--line)}
 body.mobile .next-up:not([hidden]){display:flex}
-.next-up{align-items:center;gap:12px;width:min(100%,380px);padding:9px 16px 9px 10px;border-radius:18px;background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow)}
-.next-up .check{width:28px;height:28px}
-.next-text{flex:1;min-width:0;display:flex;align-items:baseline;gap:8px;text-align:left;font-size:15px;line-height:22px;padding:4px 0}
+.next-up{align-items:center;gap:10px;width:min(100%,380px);padding:6px 16px 6px 6px;border-radius:999px;background:var(--surface);border:1px solid var(--line);box-shadow:0 10px 28px -20px rgba(15,22,38,.45)}
+.next-up .check{width:30px;height:30px;margin:4px}
+.next-text{flex:1;min-width:0;display:flex;align-items:baseline;gap:8px;text-align:left;font-size:15px;line-height:22px;padding:6px 0}
 .next-label{flex:none;font-size:12.5px;font-weight:600;color:var(--text-3)}
 .next-text .task-text{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .next-up.done .task-text{color:var(--text-3);background-size:100% 1.5px}
-body.mobile .tasks-card .card-head{padding:2px 8px 10px}
-body.mobile .calendar .cal-head{flex-direction:column;align-items:stretch;gap:14px;padding:4px 4px 0}
-body.mobile .calendar .cal-head h2{font-size:24px}
-body.mobile .stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
-body.mobile .stat{padding:12px 10px;border-radius:16px;background:var(--surface);border:1px solid var(--line)}
+
+/* plan & notes: each task is its own card, swipe to complete or delete */
+body.mobile[data-view=plan] .tasks-card{display:flex;min-height:0;padding:0;background:transparent;border-color:transparent;box-shadow:none;border-radius:0}
+body.mobile .tasks-card .card-head{padding:10px 2px 10px}
+body.mobile .panel-tabs{gap:22px;padding-bottom:10px}
+body.mobile .panel-tabs button{font-size:27px;letter-spacing:-.02em}
+body.mobile .panel-tabs .count{height:24px;min-width:24px;font-size:12.5px}
+body.mobile .task-list{padding:4px 0 8px;-webkit-mask-image:none;mask-image:none}
+body.mobile .task{position:relative;margin-bottom:8px;padding:15px 14px;gap:14px;border-radius:18px;background:var(--surface);border:1px solid var(--line);touch-action:pan-y;
+  box-shadow:0 1px 2px rgba(15,22,38,.04);transition:background-color .25s,box-shadow .25s,margin .45s var(--ease)}
+body.mobile .task.leaving{margin-bottom:0;border-width:0}
+body.mobile .task > *{transform:translateX(var(--sx,0px));transition:transform .38s var(--ease)}
+body.mobile .task.swiping > *{transition:none}
+body.mobile .task::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:var(--so,0);background-repeat:no-repeat;background-size:24px 24px}
+body.mobile .task.sw-done::before{background-color:rgba(34,197,94,.14);background-position:20px 50%;background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2316A34A%22%20stroke-width%3D%222.6%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M5%2012.5l4.5%204.5L19%207.5%22/%3E%3C/svg%3E")}
+body.mobile .task.sw-del::before{background-color:rgba(229,72,77,.13);background-position:calc(100% - 20px) 50%;background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23E5484D%22%20stroke-width%3D%222.2%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M4.5%207h15M9.5%207V5.2c0-.66.54-1.2%201.2-1.2h2.6c.66%200%201.2.54%201.2%201.2V7M6.5%207l.8%2011.3A2%202%200%200%200%209.3%2020h5.4a2%202%200%200%200%202-1.7L17.5%207%22/%3E%3C/svg%3E")}
+body.mobile .task.editing{box-shadow:0 0 0 1.5px rgba(var(--accent-rgb),.55)}
+body.mobile .empty{padding:24px 8px}
+body.mobile .add{margin-top:6px;border-radius:20px;background:var(--surface);border-color:var(--line);box-shadow:0 14px 30px -22px rgba(15,22,38,.5);padding:6px 6px 6px 16px}
+body.mobile .add input{height:46px}
+body.mobile .add-btn{width:44px;height:44px;border-radius:14px}
+body.mobile .notes{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:16px 16px 20px}
+
+/* activity */
+body.mobile[data-view=activity] .calendar{display:flex;min-height:0;overflow-y:auto;overscroll-behavior:contain;gap:14px;margin:0 -16px;padding:8px 16px 14px;-webkit-overflow-scrolling:touch}
+body.mobile .calendar .cal-head{flex-direction:column;align-items:stretch;gap:14px;padding:2px 2px 0}
+body.mobile .calendar .cal-head h2{font-size:28px;letter-spacing:-.02em}
+body.mobile .stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;padding:14px 4px;border-radius:20px;background:var(--surface);border:1px solid var(--line)}
+body.mobile .stat{min-width:0;text-align:center;padding:0 4px}
+body.mobile .stat + .stat{border-left:1px solid var(--line)}
 body.mobile .stat-v{font-size:22px}
-body.mobile .stat-v small{font-size:12px;margin-left:3px}
-body.mobile .stat-l{font-size:11.5px;line-height:1.25;margin-top:3px}
-body.mobile .cal-card{flex:1 0 auto;min-height:0;border-radius:22px}
-body.mobile .cal-grid{grid-template-rows:repeat(6,minmax(46px,1fr))}
-body.mobile .toast{bottom:calc(var(--tabbar-h) + env(safe-area-inset-bottom) + 12px)}
-body.mobile .tabbar{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));position:fixed;left:0;right:0;bottom:0;z-index:20;
-  height:calc(var(--tabbar-h) + env(safe-area-inset-bottom));padding:6px max(8px,env(safe-area-inset-right)) env(safe-area-inset-bottom) max(8px,env(safe-area-inset-left));
-  background:var(--surface);border-top:1px solid var(--line);box-shadow:0 -14px 30px -24px rgba(0,0,0,.35)}
-.tabbar button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:12px;font-weight:600;color:var(--text-3);transition:color .3s var(--ease)}
-.tb-icon{position:relative;width:60px;height:32px;border-radius:999px;display:grid;place-items:center;transition:background-color .35s var(--ease),transform .45s var(--spring)}
-.tb-icon svg{width:22px;height:22px}
-.tabbar button:active .tb-icon{transform:scale(.88)}
-.tabbar button.on{color:var(--text)}
-.tabbar button.on .tb-icon{background:rgba(var(--accent-rgb),.15);color:var(--accent);animation:pillIn .45s var(--spring)}
-@keyframes pillIn{from{transform:scaleX(.55)}to{transform:none}}
+body.mobile .stat-v small{display:none}
+body.mobile .stat-l{font-size:11.5px;margin-top:4px;white-space:nowrap}
+body.mobile .sl-long{display:none}
+body.mobile .sl-short{display:inline}
+body.mobile .cal-card{flex:1 0 auto;min-height:0;padding:14px 10px 12px;border-radius:22px}
+body.mobile .cal-top{margin-bottom:12px;padding-left:6px}
+body.mobile .cal-nav .icon-btn{width:38px;height:38px;border-radius:50%}
+body.mobile .cal-grid{grid-template-rows:repeat(6,minmax(44px,1fr));gap:5px}
+body.mobile .day{border-radius:12px}
+
+/* floating tab bar */
+body.mobile .tabbar{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));position:fixed;z-index:20;
+  left:max(14px,env(safe-area-inset-left));right:max(14px,env(safe-area-inset-right));bottom:calc(var(--tabbar-gap) + env(safe-area-inset-bottom));
+  height:var(--tabbar-h);padding:6px;border-radius:24px;background:var(--surface);
+  border:1px solid var(--line);box-shadow:0 20px 44px -20px rgba(10,16,30,.42),0 2px 8px -4px rgba(10,16,30,.12)}
+@supports ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))) and (background:color-mix(in srgb,red 50%,blue)){
+  body.mobile .tabbar{background:color-mix(in srgb,var(--surface) 80%,transparent);-webkit-backdrop-filter:blur(22px) saturate(170%);backdrop-filter:blur(22px) saturate(170%)}
+}
+.tabbar .seg-ind{top:6px;bottom:6px;border-radius:18px;background:rgba(var(--accent-rgb),.13);box-shadow:none!important}
+.tabbar button{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border-radius:18px;
+  font-size:11.5px;font-weight:600;color:var(--text-3);transition:color .3s var(--ease)}
+.tabbar button.on{color:var(--accent)}
+.tb-icon{position:relative;display:grid;place-items:center;transition:transform .45s var(--spring)}
+.tb-icon svg{width:23px;height:23px}
+.tabbar button:active .tb-icon{transform:scale(.84)}
+.tabbar button.on .tb-icon{animation:tbPop .5s var(--spring)}
+@keyframes tbPop{0%{transform:scale(.78)}60%{transform:scale(1.1)}100%{transform:none}}
 .tb-label{font-variant-numeric:tabular-nums}
 .tb-label.live{color:var(--mode)}
-.tb-badge{position:absolute;top:-3px;right:8px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--accent);color:var(--on-accent);
+.tb-badge{position:absolute;top:-6px;right:-12px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--accent);color:var(--on-accent);
   font-size:11px;font-weight:700;line-height:18px;text-align:center;box-shadow:0 0 0 2px var(--surface)}
 html.kb-open .tabbar{display:none!important}
+body.mobile .toast{bottom:calc(var(--tabbar-space) + 12px)}
+
+/* bottom sheets: settings and pop-ups slide up; drag the top down to close */
+body.mobile .settings{top:auto;bottom:0;left:0;right:0;width:100%;height:auto;max-height:calc(var(--vv-h,100svh) - max(24px,env(safe-area-inset-top)));
+  border-left:0;border-top:1px solid var(--line);border-radius:26px 26px 0 0;transform:translateY(104%);box-shadow:0 -30px 80px -30px rgba(0,0,0,.45)}
+body.mobile .settings.open{transform:translateY(var(--drag,0px))}
+body.mobile .set-head{position:sticky;padding:24px 20px 12px;border-radius:26px 26px 0 0;touch-action:none}
+body.mobile .set-head .icon-btn{width:38px;height:38px;border-radius:50%}
+body.mobile .sheet-grab{display:block;position:absolute;top:9px;left:50%;width:40px;height:5px;margin-left:-20px;border-radius:3px;background:var(--line-2)}
+body.mobile .set-body{padding:0 16px calc(28px + env(safe-area-inset-bottom))}
+body.mobile .dialog{left:0;right:0;top:auto;bottom:var(--kb-inset,0px);width:100%;max-height:calc(var(--vv-h,100svh) - 36px);
+  border-radius:28px 28px 0 0;border-width:1px 0 0;padding:30px 20px calc(20px + env(safe-area-inset-bottom));
+  transform:translateY(105%);transition:transform .5s var(--ease),opacity .25s var(--ease),visibility 0s .5s}
+body.mobile .dialog.open{transform:translateY(var(--drag,0px));transition:transform .5s var(--ease),opacity .25s var(--ease)}
+body.mobile .dialog::before{content:"";position:absolute;top:9px;left:50%;width:40px;height:5px;margin-left:-20px;border-radius:3px;background:var(--line-2)}
+body.mobile .dialog .dlg-head{touch-action:none}
+body.mobile .dialog .big-stepper{margin-top:18px}
+
+/* landscape phone */
 @media (orientation:landscape){
-  body.mobile{--tabbar-h:54px}
-  body.mobile .topbar{height:40px}
-  body.mobile .tb-icon{height:26px}
-  body.mobile .tabbar button{flex-direction:row;gap:8px}
+  body.mobile{--tabbar-h:52px;--tabbar-gap:8px}
+  body.mobile .topbar{height:38px}
+  body.mobile .tabbar{left:50%;right:auto;width:min(480px,calc(100% - 28px));transform:translateX(-50%)}
+  body.mobile .tabbar button{flex-direction:row;gap:14px}
+  body.mobile .tb-badge{right:-9px;top:-7px}
   body.mobile[data-view=timer] .timer-card{display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-areas:"ring seg" "ring ctrl" "ring next";
-    align-items:center;justify-items:center;align-content:center;column-gap:clamp(20px,5vw,56px);row-gap:12px}
+    align-items:center;justify-items:center;align-content:center;column-gap:clamp(20px,5vw,56px);row-gap:14px}
   body.mobile .timer-main{display:contents}
-  body.mobile .ring-wrap{grid-area:ring;width:clamp(170px,calc(var(--app-h,100svh) - 150px),380px)}
+  body.mobile .ring-wrap{grid-area:ring;width:clamp(170px,calc(var(--app-h,100svh) - 140px),380px)}
   body.mobile .seg-modes{grid-area:seg}
   body.mobile .controls{grid-area:ctrl}
   body.mobile .next-up{grid-area:next}
-  body.mobile .stats{grid-template-columns:repeat(4,minmax(0,1fr))}
+  body.mobile .panel-tabs button{font-size:22px}
 }
 
 @media (max-height:700px) and (min-width:761px){
@@ -829,10 +898,10 @@ html.kb-open .tabbar{display:none!important}
       <p class="muted" id="sinceText"></p>
     </div>
     <div class="stats">
-      <div class="stat"><div class="stat-v" id="stTotal">0</div><div class="stat-l">Blocks in total</div></div>
-      <div class="stat"><div class="stat-v"><span id="stStreak">0</span><small id="stStreakUnit">days</small></div><div class="stat-l">Current streak</div></div>
-      <div class="stat"><div class="stat-v" id="stBest">0</div><div class="stat-l">Best day</div></div>
-      <div class="stat"><div class="stat-v" id="stChapters">0</div><div class="stat-l">Chapters</div></div>
+      <div class="stat"><div class="stat-v" id="stTotal">0</div><div class="stat-l"><span class="sl-long">Blocks in total</span><span class="sl-short">Blocks</span></div></div>
+      <div class="stat"><div class="stat-v"><span id="stStreak">0</span><small id="stStreakUnit">days</small></div><div class="stat-l"><span class="sl-long">Current streak</span><span class="sl-short">Day streak</span></div></div>
+      <div class="stat"><div class="stat-v" id="stBest">0</div><div class="stat-l"><span class="sl-long">Best day</span><span class="sl-short">Best day</span></div></div>
+      <div class="stat"><div class="stat-v" id="stChapters">0</div><div class="stat-l"><span class="sl-long">Chapters</span><span class="sl-short">Chapters</span></div></div>
     </div>
   </div>
   <div class="cal-card rv" style="--d:2">
@@ -851,6 +920,7 @@ html.kb-open .tabbar{display:none!important}
 </section>
 
 <nav class="tabbar" id="tabbar" role="tablist" aria-label="Sections">
+  <span class="seg-ind"></span>
   <button role="tab" data-view="timer"><span class="tb-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13.2" r="7.8"/><path d="M12 9.4v3.8l2.6 1.8M9.6 2.9h4.8"/></svg></span><span class="tb-label" id="tbTimer">Timer</span></button>
   <button role="tab" data-view="plan"><span class="tb-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6.6l1.6 1.6L8.4 5.4M4 12.2l1.6 1.6 2.8-2.8M4 17.8l1.6 1.6 2.8-2.8M11.5 7h8.5M11.5 12.6h8.5M11.5 18.2h8.5"/></svg><span class="tb-badge" id="tbBadge" hidden></span></span><span class="tb-label">Plan</span></button>
   <button role="tab" data-view="activity"><span class="tb-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3.6" y="5" width="16.8" height="15.4" rx="3.2"/><path d="M3.6 9.8h16.8M8.2 3v4M15.8 3v4"/></svg></span><span class="tb-label">Activity</span></button>
@@ -859,6 +929,7 @@ html.kb-open .tabbar{display:none!important}
 <div class="set-backdrop" id="setBackdrop"></div>
 <aside class="settings" id="settings" role="dialog" aria-modal="true" aria-label="Settings" aria-hidden="true">
   <div class="set-head">
+    <span class="sheet-grab" aria-hidden="true"></span>
     <h2>Settings</h2>
     <button class="icon-btn" id="closeSettings" aria-label="Close settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
   </div>
@@ -1213,7 +1284,7 @@ function positionInd(seg) {
   ind.style.transform = `translateX(${on.offsetLeft}px)`;
   ind.style.opacity = 1;
 }
-const positionAllInds = () => $$('.seg, .panel-tabs').forEach(positionInd);
+const positionAllInds = () => $$('.seg, .panel-tabs, .tabbar').forEach(positionInd);
 
 /* ---------- Dialog ---------- */
 const dlg = $('#dialog'), dlgBackdrop = $('#dlgBackdrop');
@@ -1552,7 +1623,7 @@ function onViewport() {
   if (!editing) stableH = innerHeight;
   const open = editing && stableH - vh > 110;
   const bs = document.body.style;
-  bs.setProperty('--vv-h', Math.round(vh) + 'px'); bs.setProperty('--vv-top', Math.round(top) + 'px'); bs.setProperty('--app-h', Math.round(stableH) + 'px');
+  bs.setProperty('--vv-h', Math.round(vh) + 'px'); bs.setProperty('--kb-inset', Math.max(0, Math.round(innerHeight - (top + vh))) + 'px'); bs.setProperty('--vv-top', Math.round(top) + 'px'); bs.setProperty('--app-h', Math.round(stableH) + 'px');
   if (open !== kbOpen) { kbOpen = open; root.classList.toggle('kb-open', open); }
   updateEditSheet();
   if (open && ae) keepVisible(ae);
@@ -1723,7 +1794,48 @@ function beginEdit(li) {
   del.onpointerdown = e => e.preventDefault();
   del.onclick = () => { if (ended) return; ended = true; li.classList.remove('editing'); deleteTask(li, t); };
 }
+let swipeClickBlock = 0;
+(() => {
+  let sw = null;
+  const ARM = 88;
+  taskList.addEventListener('pointerdown', e => {
+    if (!document.body.classList.contains('mobile') || e.pointerType === 'mouse') return;
+    const li = e.target.closest('.task');
+    if (!li || li.classList.contains('editing') || li.classList.contains('leaving') || li.classList.contains('done')) return;
+    sw = { li, x: e.clientX, y: e.clientY, dx: 0, lock: null, id: e.pointerId, armed: false };
+  });
+  taskList.addEventListener('pointermove', e => {
+    if (!sw || e.pointerId !== sw.id) return;
+    const dx = e.clientX - sw.x, dy = e.clientY - sw.y;
+    if (sw.lock === null) {
+      if (Math.abs(dx) > 10 && Math.abs(dx) > Math.abs(dy) * 1.3) { sw.lock = 'x'; sw.li.classList.add('swiping'); try { sw.li.setPointerCapture(e.pointerId); } catch (err) {} }
+      else if (Math.abs(dy) > 10) { sw = null; return; }
+      else return;
+    }
+    const max = sw.li.offsetWidth * .62, v = Math.max(-max, Math.min(max, dx));
+    sw.dx = v;
+    sw.li.style.setProperty('--sx', v + 'px');
+    sw.li.style.setProperty('--so', Math.min(1, Math.abs(v) / ARM).toFixed(3));
+    sw.li.classList.toggle('sw-done', v > 0); sw.li.classList.toggle('sw-del', v < 0);
+    const armed = Math.abs(v) >= ARM;
+    if (armed !== sw.armed) { sw.armed = armed; if (armed) { haptic(10); uiSound('tap'); } }
+  });
+  const end = e => {
+    if (!sw || (e && e.pointerId !== sw.id)) return;
+    const { li, dx, lock } = sw; sw = null;
+    if (lock !== 'x') return;
+    swipeClickBlock = Date.now();
+    li.classList.remove('swiping');
+    const t = tasks.find(x => x.id === li.dataset.id);
+    if (dx >= ARM && t) { li.style.setProperty('--sx', '0px'); li.style.setProperty('--so', '0'); completeTask(li); }
+    else if (dx <= -ARM && t) { li.style.setProperty('--sx', -li.offsetWidth + 'px'); deleteTask(li, t); }
+    else { li.style.setProperty('--sx', '0px'); li.style.setProperty('--so', '0'); setTimeout(() => li.classList.remove('sw-done', 'sw-del'), 380); }
+  };
+  taskList.addEventListener('pointerup', end);
+  taskList.addEventListener('pointercancel', end);
+})();
 taskList.addEventListener('click', e => {
+  if (Date.now() - swipeClickBlock < 450) return;
   const li = e.target.closest('.task'); if (!li) return;
   if (e.target.closest('.check')) completeTask(li);
   else if (e.target.closest('.task-body') && !li.classList.contains('editing')) beginEdit(li);
@@ -2166,8 +2278,36 @@ function applyMini() {
   }
 }
 
+/* ---------- Bottom sheets: drag down to close ---------- */
+function sheetDrag(sheet, canStart, onClose) {
+  let st = null;
+  sheet.addEventListener('pointerdown', e => {
+    if (!document.body.classList.contains('mobile') || e.target.closest('button, input, textarea, .seg') || !canStart(e)) return;
+    st = { y: e.clientY, dy: 0, id: e.pointerId, t: performance.now() };
+    sheet.style.transition = 'none';
+    try { sheet.setPointerCapture(e.pointerId); } catch (err) {}
+  });
+  sheet.addEventListener('pointermove', e => {
+    if (!st || e.pointerId !== st.id) return;
+    st.dy = Math.max(0, e.clientY - st.y);
+    sheet.style.setProperty('--drag', st.dy + 'px');
+  });
+  const up = e => {
+    if (!st || (e && e.pointerId !== st.id)) return;
+    const { dy, t } = st; st = null;
+    const fast = dy > 40 && dy / Math.max(1, performance.now() - t) > .6;
+    sheet.style.transition = '';
+    sheet.style.setProperty('--drag', '0px');
+    if (dy > 110 || fast) onClose();
+  };
+  sheet.addEventListener('pointerup', up);
+  sheet.addEventListener('pointercancel', up);
+}
+sheetDrag($('#settings'), e => !!e.target.closest('.set-head'), () => closeSettings());
+sheetDrag($('#dialog'), e => e.target === $('#dialog') || !!e.target.closest('.dlg-head'), () => dlgClose && dlgClose());
+
 /* ---------- Phone layout: sections + tab bar ---------- */
-let appView = 'timer';
+let appView = 'timer', prevView = 'timer';
 const tabbar = $('#tabbar'), tbTimer = $('#tbTimer'), tbBadge = $('#tbBadge'), workspaceEl = $('.workspace'), screenEl = $('.screen');
 function setMobile(on) {
   if (on === document.body.classList.contains('mobile')) return;
@@ -2184,7 +2324,9 @@ function setView(v, { animate = true } = {}) {
   appView = v; document.body.dataset.view = v;
   $$('button[data-view]', tabbar).forEach(b => { const on = b.dataset.view === v; b.classList.toggle('on', on); b.setAttribute('aria-selected', on); });
   const el = v === 'timer' ? $('.timer-card') : v === 'plan' ? tasksCard : $('#calendar');
-  if (animate && changed) restartClass(el, 'view-in');
+  const ORDER = { timer: 0, plan: 1, activity: 2 };
+  if (animate && changed) { el.classList.remove('view-r', 'view-l'); reflow(el); el.classList.add(ORDER[v] > ORDER[prevView] ? 'view-r' : 'view-l'); }
+  prevView = v;
   if (v === 'activity') $$('.calendar .rv').forEach(x => x.classList.add('in'));
   if (settings.mview !== v) { settings.mview = v; saveSettings(); }
   requestAnimationFrame(positionAllInds);
